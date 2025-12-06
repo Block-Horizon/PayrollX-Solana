@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import apiClient from "@/lib/api-client";
+import { axiosInstance } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { motion } from "framer-motion";
 import { Plus, Building2, Users, CheckCircle, XCircle } from "lucide-react";
@@ -96,26 +96,53 @@ export default function OrganizationsPage() {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  const { data: organizations, isLoading } = useQuery({
+  const {
+    data: organizations,
+    isLoading,
+    error: orgsError,
+  } = useQuery({
     queryKey: ["organizations"],
-    queryFn: () => apiClient.get("/api/organizations").then((res) => res.data),
+    queryFn: async () => {
+      try {
+        const response = await axiosInstance.get("/api/organizations");
+        return response.data || [];
+      } catch (error: any) {
+        console.error("Failed to fetch organizations:", error);
+        throw error;
+      }
+    },
     enabled: role === "SUPER_ADMIN",
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const createOrgMutation = useMutation({
     mutationFn: (data: { name: string; description: string }) =>
-      apiClient.post("/api/organizations", data),
+      axiosInstance.post("/api/organizations", {
+        name: data.name,
+        description: data.description || undefined,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organizations"] });
       setShowCreate(false);
       setFormData({ name: "", description: "" });
-      toast.success("Organization created successfully!");
+      setFormErrors({});
+      toast.success("Organization created successfully!", {
+        description: "The new organization has been added to the system.",
+      });
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.message || "Failed to create organization"
-      );
+      console.error("Create organization error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create organization. Please try again.";
+      toast.error("Error", {
+        description: errorMessage,
+        duration: 5000,
+      });
     },
   });
 
@@ -141,17 +168,22 @@ export default function OrganizationsPage() {
 
   if (role !== "SUPER_ADMIN") {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center min-h-[400px]"
+      >
+        <div className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 max-w-md">
+          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-white mb-2">
             Access Denied
           </h2>
-          <p className="text-gray-600">
-            You don't have permission to view organizations.
+          <p className="text-gray-300">
+            You don't have permission to view organizations. Please contact your
+            administrator.
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -220,18 +252,44 @@ export default function OrganizationsPage() {
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-4 w-1/4 bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
           </div>
-        ) : (
+        ) : orgsError ? (
+          <Alert className="bg-red-500/10 border-red-500/20">
+            <AlertDescription className="text-red-400">
+              Failed to load organizations. Please try refreshing the page.
+              {orgsError instanceof Error && (
+                <span className="block mt-2 text-xs">{orgsError.message}</span>
+              )}
+            </AlertDescription>
+          </Alert>
+        ) : organizations && organizations.length > 0 ? (
           <DataTable
             columns={columns}
-            data={organizations || []}
+            data={organizations}
             searchKey="name"
             searchPlaceholder="Search organizations..."
           />
+        ) : (
+          <div className="text-center py-12">
+            <Building2 className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
+              No organizations found
+            </h3>
+            <p className="text-gray-400 mb-4">
+              Get started by creating your first organization.
+            </p>
+            <Button
+              onClick={() => setShowCreate(true)}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Organization
+            </Button>
+          </div>
         )}
       </div>
 

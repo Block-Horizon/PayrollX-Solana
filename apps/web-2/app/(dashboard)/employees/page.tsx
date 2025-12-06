@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import KYCUpload from "../../../components/employees/KYCUpload";
-import apiClient from "@/lib/api-client";
+import { axiosInstance } from "@/lib/api-client";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { motion } from "framer-motion";
 import {
@@ -149,11 +149,25 @@ export default function EmployeesPage() {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  const { data: employees, isLoading } = useQuery({
+  const {
+    data: employees,
+    isLoading,
+    error: employeesError,
+  } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => apiClient.get("/api/employees").then((res) => res.data),
+    queryFn: async () => {
+      try {
+        const response = await axiosInstance.get("/api/employees");
+        return response.data || [];
+      } catch (error: any) {
+        console.error("Failed to fetch employees:", error);
+        throw error;
+      }
+    },
     enabled: role === "ORG_ADMIN" || role === "SUPER_ADMIN",
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const createEmployeeMutation = useMutation({
@@ -162,15 +176,40 @@ export default function EmployeesPage() {
       email: string;
       salary: number;
       position: string;
-    }) => apiClient.post("/api/employees", data),
+    }) => {
+      // Split name into firstName and lastName if needed
+      const nameParts = data.name.trim().split(" ");
+      const firstName = nameParts[0] || data.name;
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      return axiosInstance.post("/api/employees", {
+        email: data.email,
+        firstName,
+        lastName,
+        salary: data.salary,
+        position: data.position,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       setShowCreate(false);
       setFormData({ name: "", email: "", salary: "", position: "" });
-      toast.success("Employee created successfully!");
+      setFormErrors({});
+      toast.success("Employee created successfully!", {
+        description: "The new employee has been added to your organization.",
+      });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create employee");
+      console.error("Create employee error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create employee. Please try again.";
+      toast.error("Error", {
+        description: errorMessage,
+        duration: 5000,
+      });
     },
   });
 
@@ -209,24 +248,24 @@ export default function EmployeesPage() {
     }
   };
 
-  const handleKYCUpload = (employeeId: string) => {
-    setSelectedEmployee(employeeId);
-    setShowKYC(true);
-  };
-
   if (role !== "ORG_ADMIN" && role !== "SUPER_ADMIN") {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center min-h-[400px]"
+      >
+        <div className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 max-w-md">
+          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-white mb-2">
             Access Denied
           </h2>
           <p className="text-gray-300">
-            You don't have permission to view employees.
+            You don't have permission to view employees. Please contact your
+            administrator.
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -316,18 +355,47 @@ export default function EmployeesPage() {
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-4 w-1/4 bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-10 w-full bg-white/10" />
           </div>
-        ) : (
+        ) : employeesError ? (
+          <Alert className="bg-red-500/10 border-red-500/20">
+            <AlertDescription className="text-red-400">
+              Failed to load employees. Please try refreshing the page.
+              {employeesError instanceof Error && (
+                <span className="block mt-2 text-xs">
+                  {employeesError.message}
+                </span>
+              )}
+            </AlertDescription>
+          </Alert>
+        ) : employees && employees.length > 0 ? (
           <DataTable
             columns={columns}
-            data={employees || []}
+            data={employees}
             searchKey="name"
             searchPlaceholder="Search employees..."
           />
+        ) : (
+          <div className="text-center py-12">
+            <User className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
+              No employees found
+            </h3>
+            <p className="text-gray-400 mb-4">
+              Get started by adding your first employee to the system.
+            </p>
+            <Button
+              onClick={() => setShowCreate(true)}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Employee
+            </Button>
+          </div>
         )}
       </div>
 
