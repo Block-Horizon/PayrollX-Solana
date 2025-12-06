@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +28,9 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
+  const loginFromApiResponse = useAuthStore(
+    (state) => state.loginFromApiResponse
+  );
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,26 +45,48 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
     try {
-      const response = await apiClient.post("/api/auth/login", data);
-      const { user, token, role } = response.data;
-      login(user, token, role);
-      toast.success("Login successful!", {
-        description: `Welcome back, ${user.name || user.email}!`,
+      const response = await apiClient.auth.login({
+        email: data.email,
+        password: data.password,
       });
 
-      if (role === "ORG_ADMIN") {
+      if (!response?.user || !response?.accessToken) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Use the new loginFromApiResponse method
+      loginFromApiResponse(response.user, response.accessToken);
+
+      toast.success("Login successful!", {
+        description: `Welcome back, ${response.user.firstName || ""} ${response.user.lastName || ""}!`,
+      });
+
+      // Navigate based on role
+      const role = response.user.role?.toLowerCase();
+      if (role === "org_admin" || role === "orgadmin") {
         router.push("/dashboard");
-      } else if (role === "EMPLOYEE") {
+      } else if (role === "employee") {
         router.push("/employee-portal");
       } else {
         router.push("/dashboard");
       }
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Login failed. Please check your credentials.";
+      console.error("Login error:", error);
+
+      // Extract error message
+      let errorMessage = "Login failed. Please check your credentials.";
+
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+
       toast.error("Login Error", {
         description: errorMessage,
+        duration: 5000,
       });
     } finally {
       setLoading(false);

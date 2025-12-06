@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +36,6 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -53,24 +51,56 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setLoading(true);
     try {
-      const response = await apiClient.post("/api/auth/register", {
-        name: data.name,
+      // Split full name into firstName and lastName
+      const nameParts = data.name.trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      if (!firstName || !lastName) {
+        toast.error("Validation Error", {
+          description: "Please provide both first and last name.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Note: Registration only returns UserDto, not tokens
+      // User needs to login after registration
+      await apiClient.auth.register({
         email: data.email,
         password: data.password,
-        organizationName: data.organizationName,
+        firstName,
+        lastName,
       });
-      const { user, token, role } = response.data;
-      login(user, token, role);
+
       toast.success("Registration successful!", {
-        description: "Welcome to PayrollX-Solana!",
+        description: "Welcome to PayrollX-Solana! Please login to continue.",
+        duration: 5000,
       });
-      router.push("/dashboard");
+
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Registration failed. Please try again.";
+      console.error("Registration error:", error);
+
+      // Extract error message
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+
       toast.error("Registration Error", {
         description: errorMessage,
+        duration: 5000,
       });
     } finally {
       setLoading(false);
