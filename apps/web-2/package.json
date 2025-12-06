@@ -12,9 +12,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "clean": "rm -rf .next out node_modules/.cache",
-    "generate:api": "ts-node scripts/generate-api.ts",
-    "predev": "npm run generate:api",
-    "prebuild": "npm run generate:api"
+    "generate:api": "ts-node scripts/generate-api.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

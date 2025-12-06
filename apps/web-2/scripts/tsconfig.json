@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "types": ["node"]
   },
   "include": ["*.ts"],
   "exclude": ["node_modules", "../../apps/**", "../../packages/**", "../../programs/**"]

@@ -14,6 +14,9 @@ import * as path from "path";
 import * as http from "http";
 import { execSync } from "child_process";
 
+// __dirname is provided by CommonJS and ts-node with ESM interop
+declare const __dirname: string;
+
 // Configuration
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL || "http://localhost:3000";
 const GATEWAY_SWAGGER_PATH = "/api/docs/unified";
@@ -204,6 +207,23 @@ async function main(): Promise<void> {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
+  // Check if already generated (fast path)
+  const apiFilePath = path.join(OUTPUT_DIR, "api.ts");
+  if (fs.existsSync(apiFilePath)) {
+    console.log("✅ API client already generated, creating index.ts if missing...");
+    const indexPath = path.join(OUTPUT_DIR, "index.ts");
+    if (!fs.existsSync(indexPath)) {
+      fs.writeFileSync(
+        indexPath,
+        "// Re-export everything from the generated api.ts\nexport * from './api';\n"
+      );
+      console.log("✅ Created index.ts");
+    }
+    console.log("✨ API code generation completed successfully!");
+    console.log(`📁 Generated files are in: ${OUTPUT_DIR}`);
+    return;
+  }
+
   // Fetch merged OpenAPI spec from API Gateway
   console.log("📥 Fetching merged OpenAPI spec from API Gateway...\n");
   const spec = await fetchOpenApiSpec();
@@ -212,12 +232,8 @@ async function main(): Promise<void> {
   let merged = mergeOpenApiSpecs([spec]);
   if (!merged.paths || Object.keys(merged.paths).length === 0) {
     console.log("⚠️  No paths in fetched spec, using static fallback...");
-    const staticSpecPath = path.join(
-      __dirname,
-      "..",
-      "scripts",
-      "openapi-static.json"
-    );
+    const staticSpecPath = path.join(__dirname, "openapi-static.json");
+    console.log(`📄 Looking for static spec at: ${staticSpecPath}`);
     if (fs.existsSync(staticSpecPath)) {
       merged = JSON.parse(fs.readFileSync(staticSpecPath, "utf-8"));
       console.log("✅ Using static fallback spec");
