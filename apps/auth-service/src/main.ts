@@ -1,147 +1,108 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { WinstonModule } from 'nest-winston';
-import helmet from 'helmet';
-import compression from 'compression';
-import { AppModule } from './app.module';
-import { winstonConfig } from './config/winston.config';
+import express from "express";
+import helmet from "helmet";
+import compression from "compression";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
+import { createWinstonLogger } from "@payrollx/common/logging";
+import { getAppConfig } from "@payrollx/common/config";
+import { createAuthDbConnection } from "@payrollx/database";
+import { connectPrisma } from "@payrollx/common/prisma";
+import {
+  createPrismaHealthCheck,
+  createHealthRoutes,
+} from "@payrollx/common/health";
+import { createAuthRoutes } from "./routes/auth.routes";
+import { errorHandler } from "./middleware/error-handler";
+import { requestLogger } from "./middleware/request-logger";
+import { swaggerSpec } from "./config/swagger.config";
 
-/**
- * Bootstrap Function
- *
- * This is the entry point of the Auth Service application.
- * It initializes the NestJS application and configures:
- * - Security middleware (Helmet)
- * - Compression middleware
- * - Global validation pipe
- * - CORS configuration
- * - Swagger documentation
- * - Global API prefix
- * - Winston logger
- *
- * Security Features:
- * - Helmet: Sets various HTTP headers for security
- * - CORS: Configured for specific origins
- * - Validation: Validates and sanitizes all incoming requests
- *
- * Documentation:
- * - Swagger UI available at /api/docs
- * - OpenAPI spec available at /api/docs-json
- *
- * @function bootstrap
- */
-async function bootstrap() {
-  // Create NestJS application instance with Winston logger
-  // Winston is configured via winstonConfig for structured logging
-  const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
-  });
+const app = express();
+const config = getAppConfig();
+const logger = createWinstonLogger({ serviceName: "auth-service" });
 
-  // Security Middleware: Helmet
-  // Sets various HTTP headers to secure the application:
-  // - X-Content-Type-Options: nosniff
-  // - X-Frame-Options: DENY
-  // - X-XSS-Protection: 1; mode=block
-  // - Strict-Transport-Security (HSTS)
-  // And many more security headers
-  app.use(helmet());
+const prisma = createAuthDbConnection();
 
-  // Compression Middleware
-  // Compresses response bodies to reduce bandwidth usage
-  // Supports gzip and deflate compression algorithms
-  app.use(compression());
+const limiter = rateLimit({
+  windowMs: 60000,
+  max: 10,
+  message: "Too many requests from this IP, please try again later.",
+});
 
-  // Global Validation Pipe
-  // Automatically validates all incoming request data
-  // - whitelist: true - strips properties that don't have decorators
-  // - forbidNonWhitelisted: true - throws error if non-whitelisted properties exist
-  // - transform: true - automatically transforms payloads to DTO instances
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // Remove properties without decorators
-      forbidNonWhitelisted: true, // Throw error on non-whitelisted properties
-      transform: true, // Transform payloads to DTO instances
-      transformOptions: {
-        enableImplicitConversion: true, // Enable implicit type conversion
-      },
-    }),
-  );
-
-  // CORS Configuration
-  // Controls which origins can access the API
-  // Configured for development and production origins
-  app.enableCors({
-    origin:
-      process.env.CORS_ORIGINS?.split(',') || [
-        'http://localhost:3000', // Next.js frontend (development)
-        'http://localhost:3100', // Alternative frontend port
-        'http://127.0.0.1:3100', // Localhost alternative
-      ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Allowed HTTP methods
+app.use(helmet());
+app.use(compression());
+app.use(
+  cors({
+    origin: config.corsOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Accept',
-      'Origin',
-      'X-Correlation-ID', // For request tracing
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+      "X-Correlation-ID",
     ],
-    credentials: true, // Allow cookies and authentication headers
-    preflightContinue: false, // Don't pass preflight requests to next handler
-    optionsSuccessStatus: 204, // Return 204 for successful OPTIONS requests
-  });
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  })
+);
 
-  // Swagger/OpenAPI Documentation Configuration
-  // Generates interactive API documentation
-  const config = new DocumentBuilder()
-    .setTitle('PayrollX Auth Service')
-    .setDescription(
-      'Authentication service for PayrollX payroll system. Handles user registration, login, token management, and authentication.',
-    )
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
-    )
-    .addTag('Authentication', 'User authentication endpoints')
-    .addTag('Health', 'Health check endpoints')
-    .build();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  // Create Swagger document and setup Swagger UI
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true, // Persist authorization in Swagger UI
-    },
-  });
+app.use(requestLogger(logger));
 
-  // Global API Prefix
-  // All routes will be prefixed with '/api'
-  // Example: /auth/login becomes /api/auth/login
-  app.setGlobalPrefix('api');
+app.use("/api", limiter);
 
-  // Start the application server
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
+const healthCheck = createPrismaHealthCheck({
+  serviceName: "auth-service",
+  prisma,
+});
 
-  // Log startup information
-  // Note: Using console.log here because Winston might not be fully initialized
-  console.log(`🚀 Auth Service running on port ${port}`);
-  console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
-  console.log(`🔍 Health check: http://localhost:${port}/api/health`);
+app.use("/health", createHealthRoutes({ healthCheck }));
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api/docs-json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.json(swaggerSpec);
+});
+
+app.use("/api/auth", createAuthRoutes(prisma, logger));
+
+app.use(errorHandler);
+
+const port = config.port || 3001;
+
+async function bootstrap() {
+  try {
+    await connectPrisma(prisma);
+    logger.info("Database connected successfully");
+
+    app.listen(port, () => {
+      logger.info(`🚀 Auth Service running on port ${port}`);
+      logger.info(
+        `📚 Swagger documentation: http://localhost:${port}/api/docs`
+      );
+      logger.info(`🔍 Health check: http://localhost:${port}/health`);
+    });
+  } catch (error) {
+    logger.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
-// Execute bootstrap function
-// Catch and log any errors during startup
-bootstrap().catch((error) => {
-  console.error('Failed to start Auth Service:', error);
-  process.exit(1);
+bootstrap();
+
+process.on("SIGTERM", async () => {
+  logger.info("SIGTERM signal received: closing HTTP server");
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  logger.info("SIGINT signal received: closing HTTP server");
+  await prisma.$disconnect();
+  process.exit(0);
 });
