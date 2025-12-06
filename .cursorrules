@@ -9,9 +9,9 @@ description: Enterprise blockchain-based payroll disbursement platform on Solana
 tech_stack:
 
 - Turborepo (monorepo)
-- Bun (package manager)
+- Bun (package manager and runtime)
 - Next.js 14+ (frontend)
-- NestJS (backend microservices)
+- Bun.js + Express (backend microservices)
 - Anchor framework (Solana programs)
 - Rust (MPC server)
 - PostgreSQL + Prisma (databases)
@@ -30,17 +30,19 @@ tech_stack:
 - Prefer functional programming patterns (immutability, pure functions)
 - Use descriptive variable names (no single letters except for loops)
 
-### NestJS Services
+### Bun.js + Express Services
 
-- Follow modular architecture: one module per domain
-- Use dependency injection for all services
-- Implement DTOs with class-validator decorators
-- Create custom decorators for repeated logic
-- Use interceptors for logging and transformation
-- Implement proper exception filters
-- Always define return types for controller methods
-- Use @Injectable() decorator for all services
-- Organize files: module → controller → service → repository
+- Follow modular architecture: organize by domain/feature
+- Use dependency injection pattern with service containers or manual DI
+- Implement DTOs with validation using zod or similar validation libraries
+- Create middleware for repeated logic (authentication, logging, error handling)
+- Use Express middleware for request/response transformation
+- Implement proper error handling middleware
+- Always define return types for route handlers
+- Organize files: routes → controllers → services → repositories
+- Use Express Router for route organization
+- Leverage Bun's native performance features (fast HTTP server, native SQLite, etc.)
+- Use Bun's built-in test runner for testing
 
 ### Prisma/Database
 
@@ -107,7 +109,7 @@ tech_stack:
 - Never commit secrets or private keys
 - Use environment variables for all configuration
 - Implement rate limiting on all public endpoints
-- Validate all user inputs with class-validator
+- Validate all user inputs with zod or similar validation libraries
 - Sanitize all database queries (Prisma handles this)
 - Use JWT with short expiration (15min) and refresh tokens
 - Implement RBAC with guards
@@ -118,7 +120,8 @@ tech_stack:
 
 ### Error Handling
 
-- Use custom exception classes that extend HttpException
+- Use custom error classes that extend Error
+- Implement centralized error handling middleware
 - Return consistent error response format:
   {
   "statusCode": number,
@@ -135,10 +138,10 @@ tech_stack:
 ### Testing
 
 - Write unit tests for all services and utilities
-- Use Jest for JavaScript/TypeScript testing
+- Use Bun's built-in test runner for JavaScript/TypeScript testing
 - Use Anchor's testing framework for Solana programs
 - Implement integration tests for inter-service communication
-- Use Supertest for API endpoint testing
+- Use Supertest or Bun's native HTTP testing for API endpoint testing
 - Mock external services in tests
 - Aim for >80% code coverage
 - Use test data builders for complex objects
@@ -160,7 +163,7 @@ tech_stack:
 - Include correlation IDs in all logs
 - Implement health check endpoints (/health)
 - Expose Prometheus metrics from all services
-- Use Winston for logging in NestJS
+- Use structured logging with pino or Bun's native logger
 - Log levels: error, warn, info, debug
 - Include user IDs and organization IDs in logs (not PII)
 - Monitor Solana transaction success rates
@@ -173,11 +176,11 @@ tech_stack:
 - Use PascalCase for classes and interfaces (UserService)
 - Use camelCase for variables and functions (getUserById)
 - Use UPPER_SNAKE_CASE for constants (API_BASE_URL)
-- Use .service.ts, .controller.ts, .module.ts suffixes for NestJS
+- Use .service.ts, .controller.ts, .routes.ts suffixes for Express
 - Use .dto.ts for Data Transfer Objects
 - Use .entity.ts for Prisma models
 - Use .interface.ts for TypeScript interfaces
-- Use .spec.ts for test files
+- Use .test.ts for test files (Bun test)
 
 ### Import Organization
 
@@ -216,16 +219,18 @@ tech_stack:
 
 ## Specific Rules
 
-### When creating new NestJS services:
+### When creating new Bun.js + Express services:
 
-1. Create module, controller, and service files
-2. Define DTOs with validation decorators
+1. Create routes, controller, and service files
+2. Define DTOs with zod schemas for validation
 3. Implement Prisma repository pattern
-4. Add health check endpoint
+4. Add health check endpoint (/health)
 5. Configure RabbitMQ/gRPC transport
-6. Add environment configuration
-7. Write unit tests
+6. Add environment configuration with validation
+7. Write unit tests using Bun test
 8. Update API gateway routing
+9. Add error handling middleware
+10. Implement request validation middleware
 
 ### When adding Anchor instructions:
 
