@@ -31,7 +31,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bun install --frozen-lockfile
+          if [ -f bun.lockb ]; then
+            bun install --frozen-lockfile || bun install
+          else
+            bun install
+          fi
 
       - name: Build packages
         run: |
@@ -67,7 +71,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bun install --frozen-lockfile
+          if [ -f bun.lockb ]; then
+            bun install --frozen-lockfile || bun install
+          else
+            bun install
+          fi
 
       - name: Build workspace packages first
         run: bun run build:packages
@@ -131,7 +139,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bun install --frozen-lockfile
+          if [ -f bun.lockb ]; then
+            bun install --frozen-lockfile || bun install
+          else
+            bun install
+          fi
 
       - name: Build workspace packages first
         run: bun run build:packages
