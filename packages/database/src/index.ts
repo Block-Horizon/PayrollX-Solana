@@ -11,7 +11,7 @@ export const createAuthDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_auth",
       },
     },
   });
@@ -25,7 +25,7 @@ export const createOrganizationDbConnection = () => {
   // Ensure DATABASE_URL is set for localhost
   const databaseUrl =
     process.env.DATABASE_URL ||
-    "postgresql://admin:adminpass@localhost:5432/payrollx_main";
+    "postgresql://admin:adminpass@localhost:5432/payrollx_org";
 
   console.log("Creating organization DB connection with URL:", databaseUrl);
 
@@ -47,7 +47,7 @@ export const createEmployeeDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_employee",
       },
     },
   });
@@ -62,7 +62,7 @@ export const createWalletDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_wallet",
       },
     },
   });
@@ -77,7 +77,7 @@ export const createPayrollDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_payroll",
       },
     },
   });
@@ -92,7 +92,7 @@ export const createTransactionDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_transaction",
       },
     },
   });
@@ -107,7 +107,7 @@ export const createNotificationDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_notification",
       },
     },
   });
@@ -122,7 +122,7 @@ export const createComplianceDbConnection = () => {
       db: {
         url:
           process.env.DATABASE_URL ||
-          "postgresql://admin:adminpass@localhost:5432/payrollx_main",
+          "postgresql://admin:adminpass@localhost:5432/payrollx_compliance",
       },
     },
   });
