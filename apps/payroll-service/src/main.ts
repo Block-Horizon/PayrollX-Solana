@@ -1,50 +1,100 @@
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { WinstonModule } from "nest-winston";
-import { AppModule } from "./app.module";
-import { winstonConfig } from "./config/winston.config";
+import express from "express";
+import helmet from "helmet";
+import compression from "compression";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
+import { createWinstonLogger } from "@payrollx/common/logging";
+import { getAppConfig } from "@payrollx/common/config";
+import { createPayrollDbConnection } from "@payrollx/database";
+import { connectPrisma } from "@payrollx/common/prisma";
+import {
+  createPrismaHealthCheck,
+  createHealthRoutes,
+} from "@payrollx/common/health";
+import { createPayrollRoutes } from "./routes/payroll.routes";
+import { errorHandler } from "./middleware/error-handler";
+import { requestLogger } from "./middleware/request-logger";
+import { startScheduler } from "./services/scheduler.service";
+import { swaggerSpec } from "./config/swagger.config";
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
-  });
+const app = express();
+const config = getAppConfig();
+const logger = createWinstonLogger({ serviceName: "payroll-service" });
 
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    })
-  );
+const prisma = createPayrollDbConnection();
 
-  // CORS configuration
-  app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
+const limiter = rateLimit({
+  windowMs: 60000,
+  max: 10,
+  message: "Too many requests from this IP, please try again later.",
+});
+
+app.use(helmet());
+app.use(compression());
+app.use(
+  cors({
+    origin: config.corsOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  });
+  })
+);
 
-  // Swagger configuration
-  const config = new DocumentBuilder()
-    .setTitle("PayrollX Payroll Service")
-    .setDescription("Payroll service for PayrollX payroll system")
-    .setVersion("1.0")
-    .addBearerAuth()
-    .build();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document);
+app.use(requestLogger(logger));
 
-  // Global prefix
-  app.setGlobalPrefix("api");
+app.use("/api", limiter);
 
-  const port = process.env.PORT || 3005;
-  await app.listen(port);
+const healthCheck = createPrismaHealthCheck({
+  serviceName: "payroll-service",
+  prisma,
+});
 
-  console.log(`🚀 Payroll Service running on port ${port}`);
-  console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
+app.use("/health", createHealthRoutes({ healthCheck }));
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api/docs-json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.json(swaggerSpec);
+});
+
+app.use("/api/payroll", createPayrollRoutes(prisma, logger));
+
+app.use(errorHandler);
+
+const port = config.port || 3005;
+
+async function bootstrap() {
+  try {
+    await connectPrisma(prisma);
+    logger.info("Database connected successfully");
+
+    startScheduler(prisma, logger);
+
+    app.listen(port, () => {
+      logger.info(`🚀 Payroll Service running on port ${port}`);
+      logger.info(
+        `📚 Swagger documentation: http://localhost:${port}/api/docs`
+      );
+    });
+  } catch (error) {
+    logger.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
 bootstrap();
+
+process.on("SIGTERM", async () => {
+  logger.info("SIGTERM signal received: closing HTTP server");
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  logger.info("SIGINT signal received: closing HTTP server");
+  await prisma.$disconnect();
+  process.exit(0);
+});
