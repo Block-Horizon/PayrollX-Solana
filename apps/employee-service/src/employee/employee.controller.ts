@@ -20,6 +20,7 @@ import {
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { EmployeeService } from "./employee.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
   CreateEmployeeDto,
   UpdateEmployeeDto,
@@ -29,7 +30,7 @@ import {
 
 @ApiTags("Employees")
 @Controller("employees")
-@UseGuards(ThrottlerGuard)
+@UseGuards(ThrottlerGuard, JwtAuthGuard)
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 

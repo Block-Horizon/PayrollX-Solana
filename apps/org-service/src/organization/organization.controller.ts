@@ -1,4 +1,4 @@
-import {
+ import {
   Controller,
   Get,
   Post,
@@ -16,6 +16,7 @@ import {
 } from "@nestjs/swagger";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { OrganizationService } from "./organization.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
   CreateOrganizationDto,
   UpdateOrganizationDto,
@@ -23,7 +24,7 @@ import {
 
 @ApiTags("Organizations")
 @Controller("organizations")
-@UseGuards(ThrottlerGuard)
+@UseGuards(ThrottlerGuard, JwtAuthGuard)
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
 
@@ -87,4 +88,3 @@ export class OrganizationController {
     );
   }
 }
-

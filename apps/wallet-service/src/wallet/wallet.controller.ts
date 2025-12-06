@@ -15,6 +15,7 @@ import {
 } from "@nestjs/swagger";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { WalletService } from "./wallet.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
   GenerateWalletDto,
   SignTransactionDto,
@@ -23,7 +24,7 @@ import {
 
 @ApiTags("Wallets")
 @Controller("wallets")
-@UseGuards(ThrottlerGuard)
+@UseGuards(ThrottlerGuard, JwtAuthGuard)
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 

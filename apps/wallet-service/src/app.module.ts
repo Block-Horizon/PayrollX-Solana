@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { WinstonModule } from "nest-winston";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { PassportModule } from "@nestjs/passport";
@@ -24,9 +24,15 @@ import { winstonConfig } from "./config/winston.config";
       },
     ]),
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || "your-secret-key",
-      signOptions: { expiresIn: "1h" },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>("JWT_SECRET"),
+        signOptions: {
+          expiresIn: configService.get<string>("JWT_EXPIRES_IN") || "1h",
+        },
+      }),
+      inject: [ConfigService],
     }),
     HttpModule,
     PrismaModule,
