@@ -2,7 +2,7 @@
 
 import { Upload } from "@/components/ui/upload";
 import { useMutation } from "@tanstack/react-query";
-import apiClient from "@/lib/api-client";
+import { axiosInstance } from "@/lib/api-client";
 import { toast } from "sonner";
 
 interface KYCUploadProps {
@@ -15,18 +15,28 @@ export default function KYCUpload({ employeeId, onSuccess }: KYCUploadProps) {
     mutationFn: (files: File[]) => {
       const formData = new FormData();
       files.forEach((file) => formData.append("kycDocs", file));
-      return apiClient.post(`/api/employees/${employeeId}/kyc`, formData, {
+      return axiosInstance.post(`/api/employees/${employeeId}/kyc`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
     },
     onSuccess: () => {
-      toast.success("KYC documents uploaded successfully!");
+      toast.success("KYC documents uploaded successfully!", {
+        description:
+          "Your documents are being reviewed. You'll be notified once verification is complete.",
+      });
       onSuccess?.();
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.message || "Failed to upload KYC documents"
-      );
+      console.error("KYC upload error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to upload KYC documents. Please try again.";
+      toast.error("Upload Error", {
+        description: errorMessage,
+        duration: 5000,
+      });
     },
   });
 

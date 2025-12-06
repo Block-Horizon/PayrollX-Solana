@@ -9,10 +9,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
-import apiClient from "@/lib/api-client";
+import { axiosInstance } from "@/lib/api-client";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Wallet, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function MpcWalletLink() {
   const { publicKey, connected } = useWallet();
@@ -21,16 +22,30 @@ export default function MpcWalletLink() {
   const generateMpcMutation = useMutation({
     mutationFn: async () => {
       if (!publicKey) throw new Error("Connect Solana wallet first");
-      const response = await apiClient.post("/api/wallet/generate-mpc", {
-        employeeId: "current-user-id",
-        publicKey: publicKey.toString(),
+      const response = await axiosInstance.post("/api/wallets/generate", {
+        employeeId: "current-user-id", // TODO: Get from auth store
+        solanaPublicKey: publicKey.toString(),
       });
-      return response.data.walletAddress;
+      return response.data?.walletAddress || response.data;
     },
-    onSuccess: (address) => {
-      setMpcAddress(address);
-      // Update employee profile via API
-      apiClient.patch("/api/employee/link-wallet", { walletAddress: address });
+    onSuccess: (walletAddress) => {
+      setMpcAddress(walletAddress);
+      toast.success("MPC Wallet Generated", {
+        description:
+          "Your MPC wallet has been successfully linked to your account.",
+      });
+    },
+    onError: (error: any) => {
+      console.error("MPC wallet generation error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to generate MPC wallet. Please try again.";
+      toast.error("Error", {
+        description: errorMessage,
+        duration: 5000,
+      });
     },
   });
 
