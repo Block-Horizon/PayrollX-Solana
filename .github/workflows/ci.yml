@@ -16,184 +16,137 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for package-lock.json
+      - name: Check for bun.lockb
         run: |
-          if [ ! -f package-lock.json ]; then
-            echo "❌ package-lock.json not found!"
-            echo "Please run 'npm install' locally to generate package-lock.json"
-            exit 1
+          if [ ! -f bun.lockb ]; then
+            echo "⚠️ bun.lockb not found, will generate during install"
+          else
+            echo "✅ bun.lockb found"
           fi
-          echo "✅ package-lock.json found"
 
       - name: Install dependencies
         run: |
-          npm set progress=false
-          npm config set fetch-retries 5
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-          for i in 1 2 3; do
-            npm ci --prefer-offline --no-audit --no-fund && break
-            echo "npm ci failed (attempt $i), retrying in 10s..."
-            sleep 10
-            if [ "$i" -eq 3 ]; then
-              echo "npm ci failed after 3 attempts"
-              exit 1
-            fi
-          done
+          bun install --frozen-lockfile
 
       - name: Build packages
         run: |
-          npm run build --workspace=packages/common
-          npm run build --workspace=packages/contracts
-          npm run build --workspace=packages/database
-          npm run build --workspace=packages/ui
+          bun run build --workspace=packages/common
+          bun run build --workspace=packages/contracts
+          bun run build --workspace=packages/database
+          bun run build --workspace=packages/ui
 
       - name: Lint packages
         run: |
-          npm run lint --workspace=packages/common
-          npm run lint --workspace=packages/contracts
-          npm run lint --workspace=packages/database
-          npm run lint --workspace=packages/ui
+          bun run lint --workspace=packages/common
+          bun run lint --workspace=packages/contracts
+          bun run lint --workspace=packages/database
+          bun run lint --workspace=packages/ui
 
   express-services:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for package-lock.json
+      - name: Check for bun.lockb
         run: |
-          if [ ! -f package-lock.json ]; then
-            echo "❌ package-lock.json not found!"
-            echo "Please run 'npm install' locally to generate package-lock.json"
-            exit 1
+          if [ ! -f bun.lockb ]; then
+            echo "⚠️ bun.lockb not found, will generate during install"
+          else
+            echo "✅ bun.lockb found"
           fi
-          echo "✅ package-lock.json found"
 
       - name: Install dependencies
         run: |
-          npm set progress=false
-          npm config set fetch-retries 5
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-          for i in 1 2 3; do
-            npm ci --prefer-offline --no-audit --no-fund && break
-            echo "npm ci failed (attempt $i), retrying in 10s..."
-            sleep 10
-            if [ "$i" -eq 3 ]; then
-              echo "npm ci failed after 3 attempts"
-              exit 1
-            fi
-          done
+          bun install --frozen-lockfile
 
       - name: Build workspace packages first
-        run: npm run build:packages
+        run: bun run build:packages
 
       - name: Generate Prisma clients
-        run: npm run db:generate
+        run: bun run db:generate
 
       - name: Build Express services
         run: |
-          npm run build --workspace=apps/api-gateway
-          npm run build --workspace=apps/auth-service
-          npm run build --workspace=apps/org-service
-          npm run build --workspace=apps/employee-service
-          npm run build --workspace=apps/wallet-service
-          npm run build --workspace=apps/payroll-service
-          npm run build --workspace=apps/transaction-service
-          npm run build --workspace=apps/notification-service
-          npm run build --workspace=apps/compliance-service
+          bun run build --workspace=apps/api-gateway
+          bun run build --workspace=apps/auth-service
+          bun run build --workspace=apps/org-service
+          bun run build --workspace=apps/employee-service
+          bun run build --workspace=apps/wallet-service
+          bun run build --workspace=apps/payroll-service
+          bun run build --workspace=apps/transaction-service
+          bun run build --workspace=apps/notification-service
+          bun run build --workspace=apps/compliance-service
 
       - name: Lint Express services
         run: |
-          npm run lint --workspace=apps/api-gateway
-          npm run lint --workspace=apps/auth-service
-          npm run lint --workspace=apps/org-service
-          npm run lint --workspace=apps/employee-service
-          npm run lint --workspace=apps/wallet-service
-          npm run lint --workspace=apps/payroll-service
-          npm run lint --workspace=apps/transaction-service
-          npm run lint --workspace=apps/notification-service
-          npm run lint --workspace=apps/compliance-service
+          bun run lint --workspace=apps/api-gateway
+          bun run lint --workspace=apps/auth-service
+          bun run lint --workspace=apps/org-service
+          bun run lint --workspace=apps/employee-service
+          bun run lint --workspace=apps/wallet-service
+          bun run lint --workspace=apps/payroll-service
+          bun run lint --workspace=apps/transaction-service
+          bun run lint --workspace=apps/notification-service
+          bun run lint --workspace=apps/compliance-service
 
       - name: Type check Express services
         run: |
-          cd apps/api-gateway && npx tsc --noEmit
-          cd ../auth-service && npx tsc --noEmit
-          cd ../org-service && npx tsc --noEmit
-          cd ../employee-service && npx tsc --noEmit
-          cd ../wallet-service && npx tsc --noEmit
-          cd ../payroll-service && npx tsc --noEmit
-          cd ../transaction-service && npx tsc --noEmit
-          cd ../notification-service && npx tsc --noEmit
-          cd ../compliance-service && npx tsc --noEmit
+          cd apps/api-gateway && bunx tsc --noEmit
+          cd ../auth-service && bunx tsc --noEmit
+          cd ../org-service && bunx tsc --noEmit
+          cd ../employee-service && bunx tsc --noEmit
+          cd ../wallet-service && bunx tsc --noEmit
+          cd ../payroll-service && bunx tsc --noEmit
+          cd ../transaction-service && bunx tsc --noEmit
+          cd ../notification-service && bunx tsc --noEmit
+          cd ../compliance-service && bunx tsc --noEmit
 
   nextjs-apps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for package-lock.json
+      - name: Check for bun.lockb
         run: |
-          if [ ! -f package-lock.json ]; then
-            echo "❌ package-lock.json not found!"
-            echo "Please run 'npm install' locally to generate package-lock.json"
-            exit 1
+          if [ ! -f bun.lockb ]; then
+            echo "⚠️ bun.lockb not found, will generate during install"
+          else
+            echo "✅ bun.lockb found"
           fi
-          echo "✅ package-lock.json found"
 
       - name: Install dependencies
         run: |
-          npm set progress=false
-          npm config set fetch-retries 5
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-          for i in 1 2 3; do
-            npm ci --prefer-offline --no-audit --no-fund && break
-            echo "npm ci failed (attempt $i), retrying in 10s..."
-            sleep 10
-            if [ "$i" -eq 3 ]; then
-              echo "npm ci failed after 3 attempts"
-              exit 1
-            fi
-          done
+          bun install --frozen-lockfile
 
       - name: Build workspace packages first
-        run: npm run build:packages
+        run: bun run build:packages
 
       - name: Build Next.js apps
         run: |
-          npm run build --workspace=apps/web-2 || echo "web-2 build skipped"
-          npm run build --workspace=apps/web || echo "web build skipped"
-          npm run build --workspace=apps/docs || echo "docs build skipped"
+          bun run build --workspace=apps/web-2 || echo "web-2 build skipped"
+          bun run build --workspace=apps/web || echo "web build skipped"
+          bun run build --workspace=apps/docs || echo "docs build skipped"
 
       - name: Lint Next.js apps
         run: |
-          npm run lint --workspace=apps/web-2 || echo "web-2 lint skipped"
-          npm run lint --workspace=apps/web || echo "web lint skipped"
-          npm run lint --workspace=apps/docs || echo "docs lint skipped"
+          bun run lint --workspace=apps/web-2 || echo "web-2 lint skipped"
+          bun run lint --workspace=apps/web || echo "web lint skipped"
+          bun run lint --workspace=apps/docs || echo "docs lint skipped"
 
   rust-mpc-server:
     runs-on: ubuntu-latest
