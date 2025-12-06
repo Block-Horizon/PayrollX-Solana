@@ -1,5 +1,13 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import jwt from "jsonwebtoken";
+
+export interface GenerateWalletResponse {
+  wallet_id: string;
+  public_key: string;
+  share_ids: string[];
+  threshold: number;
+}
 
 export class MpcClient {
   private baseUrl: string;
@@ -10,7 +18,10 @@ export class MpcClient {
     this.jwtSecret = process.env.MPC_JWT_SECRET || "secret";
   }
 
-  async generateWallet(threshold: number, totalShares: number): Promise<any> {
+  async generateWallet(
+    threshold: number,
+    totalShares: number
+  ): Promise<GenerateWalletResponse> {
     const token = this.generateToken();
     const response = await axios.post(
       `${this.baseUrl}/api/mpc/keygen`,
@@ -47,8 +58,6 @@ export class MpcClient {
   }
 
   private generateToken(): string {
-    // Generate JWT token for service-to-service auth
-    const jwt = require("jsonwebtoken");
     return jwt.sign({ sub: "wallet-service" }, this.jwtSecret, {
       expiresIn: "1h",
     });
