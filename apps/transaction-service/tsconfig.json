@@ -1,25 +1,24 @@
 {
-  "extends": "@payrollx/typescript-config/nestjs.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
     "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
-    "lib": ["ES2020"],
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "../../",
-    "moduleResolution": "node",
-    "module": "CommonJS",
+    "moduleResolution": "bundler",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "paths": {
       "@payrollx/database": ["../../packages/database/src"],
       "@payrollx/contracts": ["../../packages/contracts/src"],
@@ -27,5 +26,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts", "**/*test.ts"]
 }
