@@ -121,6 +121,7 @@ export class GatewayService {
     body?: unknown,
     method: string = 'GET',
     correlationId?: string,
+    headers?: Record<string, string>,
   ): Promise<unknown> {
     const requestId = correlationId || this.generateCorrelationId();
     const serviceName = service as ServiceName;
@@ -170,11 +171,35 @@ export class GatewayService {
 
       // Make HTTP request based on method
       let response: AxiosResponse<unknown>;
+
+      // Forward all headers, especially Authorization
+      const forwardedHeaders: Record<string, string> = {
+        'X-Correlation-ID': requestId,
+      };
+
+      // Forward Authorization header if present
+      if (headers?.['authorization']) {
+        forwardedHeaders['Authorization'] = headers['authorization'];
+      }
+      if (headers?.['Authorization']) {
+        forwardedHeaders['Authorization'] = headers['Authorization'];
+      }
+
+      // Forward other headers
+      if (headers) {
+        Object.keys(headers).forEach((key) => {
+          if (
+            key.toLowerCase() !== 'authorization' &&
+            key.toLowerCase() !== 'x-correlation-id'
+          ) {
+            forwardedHeaders[key] = headers[key];
+          }
+        });
+      }
+
       const requestConfig = {
         params: query,
-        headers: {
-          'X-Correlation-ID': requestId,
-        },
+        headers: forwardedHeaders,
       };
 
       switch (method.toUpperCase()) {

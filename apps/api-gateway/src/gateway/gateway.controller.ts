@@ -65,6 +65,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -94,6 +95,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -123,6 +125,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -152,6 +155,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -181,6 +185,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -210,6 +215,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -239,6 +245,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 
@@ -268,6 +275,7 @@ export class GatewayController {
       body,
       req.method,
       correlationId,
+      req.headers as Record<string, string>,
     );
   }
 }
