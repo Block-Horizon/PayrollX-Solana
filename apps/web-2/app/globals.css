@@ -4,107 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
+    --background: 0 0% 4%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 9%;
+    --card: 0 0% 5%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 9%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 320 80% 62%;        /* Pink accent */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14.9%;
+    --primary: 172 66% 63%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 240 4% 10%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 320 70% 20%;          /* Dark pink accent */
+    --muted: 240 4% 10%;
+    --muted-foreground: 240 5% 45%;
+    --accent: 240 4% 10%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 320 80% 50%;            /* Pink ring */
+    --border: 240 4% 10%;
+    --input: 240 4% 10%;
+    --ring: 172 66% 63%;
+    --radius: 0.5rem;
   }
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
+
+  html {
+    @apply antialiased;
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-[#09090b] text-[#fafafa];
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  ::selection {
+    background-color: rgba(94, 234, 212, 0.25);
+    color: #fafafa;
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
   }
 }
-
-/* Custom dark theme enhancements with pink accents */
-.dark body {
-  background: linear-gradient(to bottom, 
-    hsl(0, 0%, 3.9%) 0%, 
-    hsl(320, 15%, 5%) 100%);
-}
-
-/* Pink gradient accents */
-.gradient-pink {
-  background: linear-gradient(to right, 
-    rgba(236, 72, 153, 0.1) 0%, 
-    rgba(219, 39, 119, 0.05) 100%);
-}
-
-.dark .gradient-pink {
-  background: linear-gradient(to right, 
-    rgba(236, 72, 153, 0.15) 0%, 
-    rgba(219, 39, 119, 0.08) 100%);
-}
-
-/* Minimal glassmorphism effects */
-.glass {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Subtle gradients */
-.gradient-subtle {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.05) 100%);
-}
-
-.dark .gradient-subtle {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.05) 100%);
-}
-
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
