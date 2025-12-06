@@ -4,22 +4,26 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-// Force dynamic rendering to avoid static generation issues with React 19
-export const dynamic = "force-dynamic";
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
+  weight: "100 900",
+  display: "swap",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
+  weight: "100 900",
+  display: "swap",
 });
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "PayrollX - Solana Payroll Management",
-  description: "Decentralized payroll management on Solana blockchain",
-  keywords: ["payroll", "solana", "blockchain", "crypto", "payments"],
+  description: "Decentralized payroll management on the Solana blockchain.",
+  keywords: ["payroll", "solana", "blockchain", "crypto", "payments", "mpc wallet"],
   authors: [{ name: "PayrollX Team" }],
 };
 
@@ -35,9 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         <ErrorBoundary>
           <Providers>{children}</Providers>
         </ErrorBoundary>
