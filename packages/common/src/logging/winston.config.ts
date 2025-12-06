@@ -1,6 +1,5 @@
-import { WinstonModuleOptions } from "nest-winston";
 import * as winston from "winston";
-import * as DailyRotateFile from "winston-daily-rotate-file";
+import DailyRotateFile from "winston-daily-rotate-file";
 
 export interface WinstonConfigOptions {
   serviceName?: string;
@@ -10,9 +9,16 @@ export interface WinstonConfigOptions {
   enableConsoleLogging?: boolean;
 }
 
+export interface WinstonConfig {
+  level: string;
+  format: winston.Logform.Format;
+  defaultMeta: { service: string };
+  transports: winston.transport[];
+}
+
 export const createWinstonConfig = (
   options: WinstonConfigOptions = {}
-): WinstonModuleOptions => {
+): WinstonConfig => {
   const {
     serviceName = "service",
     logLevel = process.env.LOG_LEVEL || "info",
@@ -23,7 +29,6 @@ export const createWinstonConfig = (
 
   const transports: winston.transport[] = [];
 
-  // Console transport
   if (enableConsoleLogging) {
     transports.push(
       new winston.transports.Console({
@@ -35,9 +40,7 @@ export const createWinstonConfig = (
     );
   }
 
-  // File transports
   if (enableFileLogging) {
-    // Error log file
     transports.push(
       new DailyRotateFile({
         filename: `${logDir}/error-%DATE%.log`,
@@ -49,7 +52,6 @@ export const createWinstonConfig = (
       })
     );
 
-    // Combined log file
     transports.push(
       new DailyRotateFile({
         filename: `${logDir}/combined-%DATE%.log`,
@@ -60,7 +62,6 @@ export const createWinstonConfig = (
       })
     );
 
-    // Service-specific log file
     transports.push(
       new DailyRotateFile({
         filename: `${logDir}/${serviceName}-%DATE%.log`,
@@ -85,4 +86,11 @@ export const createWinstonConfig = (
   };
 };
 
-export const defaultWinstonConfig: WinstonModuleOptions = createWinstonConfig();
+export const createWinstonLogger = (
+  options: WinstonConfigOptions = {}
+): winston.Logger => {
+  const config = createWinstonConfig(options);
+  return winston.createLogger(config);
+};
+
+export const defaultWinstonConfig: WinstonConfig = createWinstonConfig();
