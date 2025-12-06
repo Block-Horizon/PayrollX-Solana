@@ -21,17 +21,19 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for bun.lockb
+      - name: Check for lockfile
         run: |
-          if [ ! -f bun.lockb ]; then
-            echo "⚠️ bun.lockb not found, will generate during install"
+          if [ -f bun.lockb ]; then
+            echo "✅ bun.lockb (binary) found"
+          elif [ -f bun.lock ]; then
+            echo "✅ bun.lock (text) found"
           else
-            echo "✅ bun.lockb found"
+            echo "⚠️ No lockfile found, will generate during install"
           fi
 
       - name: Install dependencies
         run: |
-          if [ -f bun.lockb ]; then
+          if [ -f bun.lockb ] || [ -f bun.lock ]; then
             bun install --frozen-lockfile || bun install
           else
             bun install
@@ -61,17 +63,19 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for bun.lockb
+      - name: Check for lockfile
         run: |
-          if [ ! -f bun.lockb ]; then
-            echo "⚠️ bun.lockb not found, will generate during install"
+          if [ -f bun.lockb ]; then
+            echo "✅ bun.lockb (binary) found"
+          elif [ -f bun.lock ]; then
+            echo "✅ bun.lock (text) found"
           else
-            echo "✅ bun.lockb found"
+            echo "⚠️ No lockfile found, will generate during install"
           fi
 
       - name: Install dependencies
         run: |
-          if [ -f bun.lockb ]; then
+          if [ -f bun.lockb ] || [ -f bun.lock ]; then
             bun install --frozen-lockfile || bun install
           else
             bun install
@@ -129,17 +133,19 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      - name: Check for bun.lockb
+      - name: Check for lockfile
         run: |
-          if [ ! -f bun.lockb ]; then
-            echo "⚠️ bun.lockb not found, will generate during install"
+          if [ -f bun.lockb ]; then
+            echo "✅ bun.lockb (binary) found"
+          elif [ -f bun.lock ]; then
+            echo "✅ bun.lock (text) found"
           else
-            echo "✅ bun.lockb found"
+            echo "⚠️ No lockfile found, will generate during install"
           fi
 
       - name: Install dependencies
         run: |
-          if [ -f bun.lockb ]; then
+          if [ -f bun.lockb ] || [ -f bun.lock ]; then
             bun install --frozen-lockfile || bun install
           else
             bun install
