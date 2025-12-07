@@ -1,431 +1,308 @@
-# PayrollX-Solana: Enterprise Payroll System on Solana
+# PayrollX-Solana
 
-A comprehensive enterprise payroll system built on Solana blockchain with Multi-Party Computation (MPC) threshold signatures, microservices architecture, and modern web technologies.
+Enterprise blockchain-based payroll disbursement platform built on Solana with Multi-Party Computation (MPC) threshold signatures for secure wallet management.
 
-## 🏗️ Architecture Overview
+## Overview
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Next.js       │    │   API Gateway   │    │   Microservices │
-│   Frontend      │◄──►│   (NestJS)      │◄──►│   (NestJS)      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   MPC Server    │    │   RabbitMQ      │    │   PostgreSQL    │
-│   (Rust)        │◄──►│   Message Queue │◄──►│   Database      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Solana        │    │   Prometheus    │    │   Grafana       │
-│   Blockchain    │◄──►│   Monitoring    │◄──►│   Dashboard     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+PayrollX-Solana is a microservices-based payroll system that enables organizations to manage employee payroll disbursements on the Solana blockchain. The system uses MPC threshold signatures to securely manage wallet operations without exposing private keys, ensuring enterprise-grade security for blockchain transactions.
 
-## 🚀 Quick Start
+### Key Features
 
-### Prerequisites
+- Multi-Party Computation (MPC) threshold signatures for secure wallet operations
+- Microservices architecture with API gateway for request routing
+- Role-based access control (RBAC) for different user types
+- Employee portal for viewing payroll information
+- Organization management with KYC support
+- Payroll processing and scheduling
+- Transaction management on Solana blockchain
+- Compliance and audit logging
+- Real-time notifications
 
-- **Docker & Docker Compose**: For containerized services
-- **Yarn**: Package manager
-- **Rust**: For MPC server (if building from source)
-- **Node.js 18+**: For TypeScript/JavaScript services
+## Architecture
 
-### One-Command Setup
+The system consists of:
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd payrollx-solana
+- **Frontend**: Next.js web application
+- **API Gateway**: Express.js service for routing and authentication
+- **Microservices**: Express.js services for auth, organizations, employees, wallets, payroll, transactions, notifications, and compliance
+- **MPC Server**: Rust service for threshold signature operations
+- **Infrastructure**: PostgreSQL databases, RabbitMQ message queue, Redis cache
+- **Blockchain**: Solana programs for on-chain payroll operations
 
-# Run the complete system setup
-./scripts/setup-system.sh
-```
+## Prerequisites
 
-This script will:
+- Bun 1.22.0 or higher
+- Node.js 22 or higher
+- PostgreSQL 16
+- RabbitMQ 3
+- Redis 7
+- Rust (for MPC server development)
+- Docker and Docker Compose (optional, for containerized setup)
 
-1. ✅ Check prerequisites
-2. ✅ Create environment files
-3. ✅ Install dependencies
-4. ✅ Build all services
-5. ✅ Start infrastructure (PostgreSQL, RabbitMQ, Redis, Solana)
-6. ✅ Run database migrations
-7. ✅ Start all microservices
-8. ✅ Start monitoring services
-9. ✅ Start frontend
-10. ✅ Run integration tests
+## Quick Start
 
-### Manual Setup
+### Setup with Docker (Recommended)
 
-If you prefer to set up services manually:
+This script sets up infrastructure services (PostgreSQL, RabbitMQ, Redis) using Docker and prepares the project:
 
 ```bash
-# 1. Install dependencies
-yarn install
-
-# 2. Start infrastructure
-docker-compose up -d postgres rabbitmq redis solana
-
-# 3. Run migrations
-yarn db:migrate
-
-# 4. Start MPC server
-docker-compose up -d mpc-server
-
-# 5. Start all services
-docker-compose up -d
-
-# 6. Start frontend
-yarn dev
+./scripts/setup-with-docker.sh
 ```
 
-## 📁 Project Structure
+Then start the application services:
+
+```bash
+./scripts/run-with-docker.sh
+```
+
+### Setup without Docker
+
+This script sets up the project assuming you have PostgreSQL, RabbitMQ, and Redis running locally:
+
+```bash
+./scripts/setup-without-docker.sh
+```
+
+Then start the application services:
+
+```bash
+./scripts/run-without-docker.sh
+```
+
+## Setup Scripts
+
+### Environment Setup
+
+Sets up all environment files from examples:
+
+```bash
+./scripts/setup-env.sh
+```
+
+This script:
+- Creates `.env.local` from `.env.example` if it doesn't exist
+- Creates `.env` files for all services from their `env.example` files
+
+### Database Setup
+
+Initializes all databases and runs migrations:
+
+```bash
+./scripts/setup-db.sh
+```
+
+This script:
+- Creates all required databases (payrollx_auth, payrollx_org, etc.)
+- Runs Prisma migrations for all services
+- Generates Prisma clients
+
+### Full Setup with Docker
+
+Complete setup including infrastructure services via Docker:
+
+```bash
+./scripts/setup-with-docker.sh
+```
+
+This script:
+- Starts PostgreSQL, RabbitMQ, and Redis using Docker Compose
+- Installs dependencies
+- Sets up environment files
+- Builds shared packages
+- Initializes databases
+
+### Run with Docker Infrastructure
+
+Starts all application services (infrastructure must be running via Docker):
+
+```bash
+./scripts/run-with-docker.sh
+```
+
+### Full Setup without Docker
+
+Complete setup assuming local infrastructure services:
+
+```bash
+./scripts/setup-without-docker.sh
+```
+
+This script:
+- Checks for required services (PostgreSQL, RabbitMQ, Redis)
+- Installs dependencies
+- Sets up environment files
+- Builds shared packages
+- Initializes databases
+
+### Run without Docker
+
+Starts all application services (infrastructure must be running locally):
+
+```bash
+./scripts/run-without-docker.sh
+```
+
+## Manual Setup
+
+If you prefer to set up manually:
+
+### 1. Set Up Environment
+
+```bash
+./scripts/setup-env.sh
+```
+
+Or manually copy `.env.example` to `.env.local` and configure service `.env` files.
+
+### 2. Install Dependencies
+
+```bash
+bun install
+```
+
+### 3. Build Shared Packages
+
+```bash
+bun run build:packages
+```
+
+### 4. Set Up Databases
+
+```bash
+./scripts/setup-db.sh
+```
+
+### 5. Start Infrastructure (if not using Docker)
+
+**PostgreSQL:**
+```bash
+# Create databases
+createdb payrollx_auth
+createdb payrollx_org
+createdb payrollx_employee
+createdb payrollx_wallet
+createdb payrollx_payroll
+createdb payrollx_transaction
+createdb payrollx_notification
+createdb payrollx_compliance
+```
+
+**RabbitMQ:**
+```bash
+# macOS: brew install rabbitmq && rabbitmq-server
+# Linux: sudo apt-get install rabbitmq-server && rabbitmq-server
+```
+
+**Redis:**
+```bash
+# macOS: brew install redis && redis-server
+# Linux: sudo apt-get install redis-server && redis-server
+```
+
+### 6. Start Services
+
+```bash
+bun run dev
+```
+
+This will start:
+- Frontend on http://localhost:3100
+- API Gateway on http://localhost:3000
+- All microservices on their respective ports
+- MPC server on http://localhost:8080
+
+## Project Structure
 
 ```
 payrollx-solana/
-├── apps/                          # Applications
-│   ├── web/                       # Next.js Frontend
-│   ├── api-gateway/               # NestJS API Gateway
-│   ├── auth-service/              # Authentication Service
-│   ├── org-service/               # Organization Management
-│   ├── employee-service/          # Employee Management
-│   ├── wallet-service/            # Wallet Management
-│   ├── payroll-service/           # Payroll Processing
-│   ├── transaction-service/       # Transaction Management
-│   ├── notification-service/      # Notifications
-│   ├── compliance-service/        # Compliance & Audit
-│   └── mpc-server/                # Rust MPC Server
-├── packages/                      # Shared Packages
-│   ├── ui/                        # UI Components
-│   ├── contracts/                 # API Contracts
-│   └── database/                  # Database Schemas
-├── programs/                      # Solana Programs
-│   └── payroll-solana/            # Anchor Program
-├── monitoring/                    # Monitoring Config
-├── scripts/                       # Utility Scripts
-└── docker-compose.yml            # Docker Configuration
+├── apps/
+│   ├── web/                    # Next.js frontend
+│   ├── api-gateway/            # Express.js API gateway
+│   ├── auth-service/           # Authentication service
+│   ├── org-service/            # Organization management
+│   ├── employee-service/       # Employee management
+│   ├── wallet-service/         # Wallet management
+│   ├── payroll-service/        # Payroll processing
+│   ├── transaction-service/    # Transaction management
+│   ├── notification-service/   # Notifications
+│   ├── compliance-service/    # Compliance and audit
+│   └── mpc-server/             # Rust MPC server
+├── packages/
+│   ├── common/                 # Shared utilities
+│   ├── contracts/              # API contracts
+│   ├── database/               # Prisma schemas
+│   └── ui/                     # UI components
+├── programs/
+│   └── payroll-solana/         # Solana Anchor program
+└── scripts/                    # Utility scripts
 ```
 
-## 🔧 Services
+## Services
 
-### Frontend (Next.js)
+- **Frontend**: http://localhost:3100
+- **API Gateway**: http://localhost:3000
+- **Auth Service**: http://localhost:3001
+- **Org Service**: http://localhost:3002
+- **Employee Service**: http://localhost:3003
+- **Wallet Service**: http://localhost:3005
+- **Payroll Service**: http://localhost:3006
+- **Transaction Service**: http://localhost:3007
+- **Notification Service**: http://localhost:3008
+- **Compliance Service**: http://localhost:3009
+- **MPC Server**: http://localhost:8080
 
-- **Port**: 3000
-- **Features**: Authentication, Dashboard, Employee Portal, Real-time Updates
-- **Tech Stack**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui, Zustand, React Query
+## Development
 
-### API Gateway (NestJS)
-
-- **Port**: 3000/api
-- **Features**: Request routing, Authentication, Rate limiting, CORS
-- **Tech Stack**: NestJS, PassportJS, JWT
-
-### Microservices (NestJS)
-
-- **Auth Service** (3001): JWT authentication, user management
-- **Org Service** (3002): Organization management, KYC
-- **Employee Service** (3003): Employee management, KYC processing
-- **Wallet Service** (3005): MPC wallet integration
-- **Payroll Service** (3006): Payroll processing, scheduling
-- **Transaction Service** (3007): Solana transaction management
-- **Notification Service** (3008): Email/SMS notifications
-- **Compliance Service** (3009): Audit logging, compliance
-
-### MPC Server (Rust)
-
-- **Port**: 8080
-- **Features**: Threshold signatures, key generation, secure signing
-- **Tech Stack**: Actix-web, Ed25519, JWT authentication
-
-### Infrastructure
-
-- **PostgreSQL**: Multi-database setup for each service
-- **RabbitMQ**: Message queuing for inter-service communication
-- **Redis**: Caching and session storage
-- **Solana**: Test validator for development
-
-### Monitoring
-
-- **Prometheus**: Metrics collection
-- **Grafana**: Dashboards and visualization
-
-## 🔐 Security Features
-
-### Authentication & Authorization
-
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Multi-factor authentication support
-- Session management with Redis
-
-### MPC Security
-
-- Threshold signature scheme (2-of-3 by default)
-- Ed25519 cryptographic signatures
-- Secure key share storage
-- Automatic key cleanup
-- JWT authentication for MPC endpoints
-
-### Blockchain Security
-
-- Solana program validation
-- PDA (Program Derived Address) verification
-- Reentrancy protection
-- Overflow checks
-- Access control on all instructions
-
-### Data Protection
-
-- Encrypted data at rest
-- Secure API communication (HTTPS)
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-
-## 🚀 Deployment
-
-### Development
+### Running Tests
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f [service-name]
-
-# Stop services
-docker-compose down
+bun run test
 ```
 
-### Production
+### Linting
 
 ```bash
-# Build production images
-docker-compose -f docker-compose.prod.yml build
-
-# Deploy to production
-docker-compose -f docker-compose.prod.yml up -d
+bun run lint
 ```
 
-### Kubernetes
+### Type Checking
 
 ```bash
-# Apply Kubernetes manifests
-kubectl apply -f k8s/
-
-# Check deployment status
-kubectl get pods
-kubectl get services
+bun run check-types
 ```
 
-## 📊 Monitoring & Observability
-
-### Health Checks
-
-- All services expose `/health` endpoints
-- Automatic health monitoring
-- Service discovery and load balancing
-
-### Metrics
-
-- Request rates and latency
-- Database query performance
-- RabbitMQ queue depths
-- Solana transaction success rates
-- Custom business metrics
-
-### Logging
-
-- Structured logging with correlation IDs
-- Centralized log aggregation
-- Real-time log streaming
-- Log retention policies
-
-### Alerting
-
-- Critical service failures
-- High error rates
-- Resource utilization
-- Security incidents
-
-## 🧪 Testing
-
-### Unit Tests
+### Database Operations
 
 ```bash
-# Run all unit tests
-yarn test
-
-# Run tests for specific service
-yarn test:auth-service
-yarn test:wallet-service
-```
-
-### Integration Tests
-
-```bash
-# Run integration tests
-yarn test:integration
-
-# Run E2E tests
-yarn test:e2e
-```
-
-### Load Testing
-
-```bash
-# Run load tests
-yarn test:load
-
-# Run stress tests
-yarn test:stress
-```
-
-## 🔄 CI/CD Pipeline
-
-### GitHub Actions
-
-- **Lint & Type Check**: On every PR
-- **Unit Tests**: Automated testing
-- **Build**: Docker image creation
-- **Deploy**: Staging deployment on merge
-- **Security**: Dependency scanning
-
-### Deployment Stages
-
-1. **Development**: Feature branches
-2. **Staging**: Integration testing
-3. **Production**: Manual approval required
-
-## 📈 Performance
-
-### Scalability
-
-- Horizontal pod autoscaling
-- Database connection pooling
-- Redis clustering
-- Load balancing
-
-### Optimization
-
-- Database query optimization
-- Caching strategies
-- CDN integration
-- Image optimization
-
-## 🛠️ Development
-
-### Adding New Features
-
-1. Create feature branch
-2. Implement changes
-3. Add tests
-4. Update documentation
-5. Create pull request
-
-### Code Standards
-
-- TypeScript strict mode
-- ESLint configuration
-- Prettier formatting
-- Conventional commits
-
-### Database Migrations
-
-```bash
-# Create migration
-yarn db:migrate:create [service-name] [migration-name]
+# Generate Prisma clients
+bun run db:generate
 
 # Run migrations
-yarn db:migrate
+bun run db:migrate
 
-# Rollback migration
-yarn db:rollback
+# Push schema changes
+bun run db:push
 ```
 
-## 📚 API Documentation
+## Environment Configuration
 
-### Swagger/OpenAPI
+The root `.env.example` file contains all environment variables needed for local development with Docker. Copy it to `.env.local`:
 
-- Available at `/api/docs` for each service
-- Interactive API explorer
-- Request/response examples
-- Authentication requirements
+```bash
+cp .env.example .env.local
+```
 
-### Postman Collection
+Each service also has its own `env.example` file in `apps/[service-name]/env.example`. The `setup-env.sh` script automatically creates `.env` files for all services from these examples.
 
-- Import from `docs/postman/`
-- Environment variables included
-- Test scenarios provided
+Key environment variables:
+- Database connection strings (PostgreSQL)
+- JWT secrets for authentication
+- Service URLs and ports
+- RabbitMQ connection settings
+- Redis connection settings
+- Solana RPC endpoints
+- MPC server configuration
 
-## 🔧 Configuration
+## License
 
-### Environment Variables
-
-Each service has its own `.env` file with:
-
-- Database connections
-- JWT secrets
-- Service URLs
-- Feature flags
-
-### Feature Flags
-
-- A/B testing support
-- Gradual rollouts
-- Emergency toggles
-- Environment-specific configs
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is proprietary software. All rights reserved.
-
-## 🆘 Support
-
-### Documentation
-
-- [API Documentation](docs/api/)
-- [Architecture Guide](docs/architecture/)
-- [Deployment Guide](docs/deployment/)
-
-### Troubleshooting
-
-- [Common Issues](docs/troubleshooting/)
-- [FAQ](docs/faq/)
-- [Support Contact](mailto:support@payrollx.com)
-
-## 🎯 Roadmap
-
-### Phase 1 (Current)
-
-- ✅ Core payroll functionality
-- ✅ MPC threshold signatures
-- ✅ Basic monitoring
-- ✅ Docker deployment
-
-### Phase 2 (Next)
-
-- 🔄 Advanced analytics
-- 🔄 Mobile applications
-- 🔄 Multi-currency support
-- 🔄 Advanced compliance
-
-### Phase 3 (Future)
-
-- 📋 AI-powered insights
-- 📋 Advanced security features
-- 📋 Global expansion
-- 📋 Enterprise integrations
-
----
-
-**Built with ❤️ by the PayrollX Team**
+Proprietary software. All rights reserved.
