@@ -302,7 +302,3 @@ Key environment variables:
 - Redis connection settings
 - Solana RPC endpoints
 - MPC server configuration
-
-## License
-
-Proprietary software. All rights reserved.
