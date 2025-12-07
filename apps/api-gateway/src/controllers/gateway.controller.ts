@@ -1,12 +1,14 @@
-import { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Logger } from 'winston';
 import { proxyRequest } from '../services/gateway.service';
+import type { AppError } from '../middleware/error-handler';
 
 export const createGatewayController = (logger: Logger) => {
   const proxyToService = async (
     service: string,
     req: Request,
     res: Response,
+    next: NextFunction,
   ) => {
     try {
       const pathMatch = req.path.match(new RegExp(`^/${service}/(.*)$`));
@@ -35,6 +37,14 @@ export const createGatewayController = (logger: Logger) => {
 
       res.status(200).json(result);
     } catch (error) {
+      logger.error(`Failed to proxy request to ${service}:`, error);
+
+      if (error instanceof Error && 'statusCode' in error) {
+        const appError = error as AppError;
+        next(appError);
+        return;
+      }
+
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       const statusCode =
@@ -42,32 +52,33 @@ export const createGatewayController = (logger: Logger) => {
           ? (error.statusCode as number)
           : 500;
 
-      logger.error(`Failed to proxy request to ${service}:`, error);
-      res.status(statusCode).json({
-        statusCode,
-        message: errorMessage,
-        timestamp: new Date().toISOString(),
-        path: `/api/${service}/*`,
-      });
+      const appError: AppError = new Error(errorMessage);
+      appError.statusCode = statusCode;
+      appError.error =
+        error && typeof error === 'object' && 'error' in error
+          ? (error.error as string)
+          : undefined;
+
+      next(appError);
     }
   };
 
   return {
-    proxyToAuth: (req: Request, res: Response) =>
-      proxyToService('auth', req, res),
-    proxyToOrg: (req: Request, res: Response) =>
-      proxyToService('org', req, res),
-    proxyToEmployee: (req: Request, res: Response) =>
-      proxyToService('employee', req, res),
-    proxyToWallet: (req: Request, res: Response) =>
-      proxyToService('wallet', req, res),
-    proxyToPayroll: (req: Request, res: Response) =>
-      proxyToService('payroll', req, res),
-    proxyToTransaction: (req: Request, res: Response) =>
-      proxyToService('transaction', req, res),
-    proxyToNotification: (req: Request, res: Response) =>
-      proxyToService('notification', req, res),
-    proxyToCompliance: (req: Request, res: Response) =>
-      proxyToService('compliance', req, res),
+    proxyToAuth: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('auth', req, res, next),
+    proxyToOrg: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('org', req, res, next),
+    proxyToEmployee: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('employee', req, res, next),
+    proxyToWallet: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('wallet', req, res, next),
+    proxyToPayroll: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('payroll', req, res, next),
+    proxyToTransaction: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('transaction', req, res, next),
+    proxyToNotification: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('notification', req, res, next),
+    proxyToCompliance: (req: Request, res: Response, next: NextFunction) =>
+      proxyToService('compliance', req, res, next),
   };
 };

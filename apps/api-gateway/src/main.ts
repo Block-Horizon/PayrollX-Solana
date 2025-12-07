@@ -10,6 +10,7 @@ import { createHealthCheck, createHealthRoutes } from '@payrollx/common';
 import { createGatewayRoutes } from './routes/gateway.routes';
 import { createSwaggerAggregatorRoutes } from './routes/swagger-aggregator.routes';
 import { errorHandler } from './middleware/error-handler';
+import { corsErrorHandler } from './middleware/cors-error-handler';
 import { requestLogger } from './middleware/request-logger';
 import { swaggerSpec } from './config/swagger.config';
 
@@ -20,14 +21,38 @@ const logger = createWinstonLogger({ serviceName: 'api-gateway' });
 const limiter = rateLimit({
   windowMs: 60000,
   max: 100,
-  message: 'Too many requests from this IP, please try again later.',
+  handler: (req, res) => {
+    res.status(429).json({
+      statusCode: 429,
+      message: 'Too many requests from this IP, please try again later.',
+      error: 'TOO_MANY_REQUESTS',
+      timestamp: new Date().toISOString(),
+      path: req.path,
+    });
+  },
 });
 
 app.use(helmet());
 app.use(compression());
 app.use(
   cors({
-    origin: config.corsOrigins,
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (config.corsOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        const error = new Error('Not allowed by CORS') as Error & {
+          statusCode?: number;
+          error?: string;
+        };
+        error.statusCode = 403;
+        error.error = 'CORS_ERROR';
+        callback(error, false);
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
@@ -48,7 +73,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger(logger));
 
-app.use('/api', limiter);
+app.use('/api', (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  return limiter(req, res, next);
+});
 
 app.get('/', (_req, res) => {
   res.json({ message: 'PayrollX API Gateway' });
@@ -73,6 +103,17 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', createSwaggerAggregatorRoutes(logger));
 app.use('/api', createGatewayRoutes(logger));
 
+app.use((_req, res) => {
+  res.status(404).json({
+    statusCode: 404,
+    message: 'Route not found',
+    error: 'NOT_FOUND',
+    timestamp: new Date().toISOString(),
+    path: _req.path,
+  });
+});
+
+app.use(corsErrorHandler);
 app.use(errorHandler);
 
 const port = config.port || 3000;
@@ -105,4 +146,13 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   logger.info('SIGINT signal received: closing HTTP server');
   process.exit(0);
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  logger.error('Unhandled Promise Rejection:', reason);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught Exception:', error);
+  process.exit(1);
 });

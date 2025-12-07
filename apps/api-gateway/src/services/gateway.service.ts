@@ -1,5 +1,5 @@
 import { Logger } from 'winston';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, type AxiosResponse } from 'axios';
 
 export type ServiceName =
   | 'auth'
@@ -189,10 +189,19 @@ export const proxyRequest = async (
 
     if (errorDetails.isAxiosError) {
       const statusCode = errorDetails.statusCode || 500;
-      const errorObj: AppError = new Error(
-        errorDetails.message || 'Service request failed',
-      );
+      const responseData = errorDetails.response as
+        | { message?: string; error?: string }
+        | undefined;
+
+      const actualMessage =
+        responseData?.message ||
+        errorDetails.message ||
+        'Service request failed';
+
+      const errorObj: AppError = new Error(actualMessage);
       errorObj.statusCode = statusCode;
+      errorObj.error = responseData?.error;
+
       throw errorObj;
     }
 
@@ -202,4 +211,5 @@ export const proxyRequest = async (
 
 export interface AppError extends Error {
   statusCode?: number;
+  error?: string;
 }

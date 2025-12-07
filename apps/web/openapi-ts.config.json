@@ -1,0 +1,8 @@
+{
+  "client": "axios",
+  "input": "/Users/temelio/Documents/PayrollX-Solana/apps/web-2/lib/generated/openapi-merged.json",
+  "output": {
+    "format": "prettier",
+    "path": "/Users/temelio/Documents/PayrollX-Solana/apps/web-2/lib/generated"
+  }
+}
