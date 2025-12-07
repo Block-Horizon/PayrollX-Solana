@@ -2,8 +2,8 @@
   "name": "@payrollx/common",
   "version": "1.0.0",
   "description": "Common utilities and components for PayrollX services",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "module": "index.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -25,25 +25,6 @@
     "typescript": "^5.0.0"
   },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./health": {
-      "types": "./dist/health/index.d.ts",
-      "default": "./dist/health/index.js"
-    },
-    "./logging": {
-      "types": "./dist/logging/index.d.ts",
-      "default": "./dist/logging/index.js"
-    },
-    "./prisma": {
-      "types": "./dist/prisma/index.d.ts",
-      "default": "./dist/prisma/index.js"
-    },
-    "./config": {
-      "types": "./dist/config/index.d.ts",
-      "default": "./dist/config/index.js"
-    }
+    ".": "./src/index.ts"
   }
 }
