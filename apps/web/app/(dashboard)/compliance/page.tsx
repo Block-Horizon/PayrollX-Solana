@@ -62,7 +62,7 @@ const auditColumns = (auditLogs: AuditLog[]) => [
     accessorKey: "timestamp",
     header: "Date",
     cell: ({ row }: any) => (
-      <span className="text-white text-sm">
+      <span className="text-[#fafafa] text-sm">
         {new Date(row.original.timestamp).toLocaleDateString("en-US", {
           year: "numeric",
           month: "short",
@@ -86,7 +86,7 @@ const auditColumns = (auditLogs: AuditLog[]) => [
     accessorKey: "userId",
     header: "User",
     cell: ({ row }: any) => (
-      <span className="text-white font-mono text-sm">
+      <span className="text-[#fafafa] font-mono text-sm">
         {row.original.userId}
       </span>
     ),
@@ -115,7 +115,7 @@ const auditColumns = (auditLogs: AuditLog[]) => [
     accessorKey: "details",
     header: "Details",
     cell: ({ row }: any) => (
-      <span className="text-gray-300 text-sm max-w-xs truncate">
+      <span className="text-[#71717a] text-sm max-w-xs truncate">
         {row.original.details}
       </span>
     ),
@@ -128,7 +128,7 @@ const auditColumns = (auditLogs: AuditLog[]) => [
         size="sm"
         variant="outline"
         onClick={() => exportSingleLog(row.original.id, auditLogs)}
-        className="border-white/20 text-white hover:bg-white/10"
+        className="border-[#27272a] text-[#fafafa] hover:bg-[#27272a]"
       >
         <Download className="w-4 h-4" />
       </Button>
@@ -258,15 +258,15 @@ export default function CompliancePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#5eead4]"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
         <Card className="bg-red-500/10 border-red-500/30 max-w-md">
           <CardContent className="p-6 text-center">
             <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -291,21 +291,21 @@ export default function CompliancePage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 p-6"
+      className="min-h-screen bg-[#09090b] p-6"
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-[#fafafa] mb-2">
               Compliance & Audit
             </h1>
-            <p className="text-gray-400">
+            <p className="text-[#71717a]">
               Monitor security events and export audit logs
             </p>
           </div>
           <Button
             onClick={exportCSV}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -314,9 +314,9 @@ export default function CompliancePage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+          <Card className="bg-[#18181b] border-[#27272a]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
+              <CardTitle className="text-sm font-medium text-[#71717a] flex items-center">
                 <AlertTriangle className="w-4 h-4 mr-2 text-red-500" />
                 Critical
               </CardTitle>
@@ -328,9 +328,9 @@ export default function CompliancePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+          <Card className="bg-[#18181b] border-[#27272a]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
+              <CardTitle className="text-sm font-medium text-[#71717a] flex items-center">
                 <Shield className="w-4 h-4 mr-2 text-orange-500" />
                 High
               </CardTitle>
@@ -342,9 +342,9 @@ export default function CompliancePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+          <Card className="bg-[#18181b] border-[#27272a]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
+              <CardTitle className="text-sm font-medium text-[#71717a] flex items-center">
                 <Clock className="w-4 h-4 mr-2 text-yellow-500" />
                 Medium
               </CardTitle>
@@ -356,9 +356,9 @@ export default function CompliancePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+          <Card className="bg-[#18181b] border-[#27272a]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
+              <CardTitle className="text-sm font-medium text-[#71717a] flex items-center">
                 <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
                 Low
               </CardTitle>
@@ -372,10 +372,10 @@ export default function CompliancePage() {
         </div>
 
         {/* Audit Logs Table */}
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className="bg-[#18181b] border-[#27272a]">
           <CardHeader>
-            <CardTitle className="text-white">Audit Logs</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-[#fafafa]">Audit Logs</CardTitle>
+            <CardDescription className="text-[#71717a]">
               Security events and system activities
             </CardDescription>
           </CardHeader>

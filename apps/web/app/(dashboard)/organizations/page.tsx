@@ -27,7 +27,7 @@ const columns = [
     header: "Organization",
     cell: ({ row }: any) => (
       <div className="flex items-center space-x-2">
-        <Building2 className="h-4 w-4 text-purple-500" />
+        <Building2 className="h-4 w-4 text-[#5eead4]" />
         <span className="font-medium">{row.getValue("name")}</span>
       </div>
     ),
@@ -173,12 +173,12 @@ export default function OrganizationsPage() {
         animate={{ opacity: 1, scale: 1 }}
         className="flex items-center justify-center min-h-[400px]"
       >
-        <div className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 max-w-md">
+        <div className="text-center bg-[#18181b] border-[#27272a] rounded-lg p-8 max-w-md">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-white mb-2">
+          <h2 className="text-2xl font-semibold text-[#fafafa] mb-2">
             Access Denied
           </h2>
-          <p className="text-gray-300">
+          <p className="text-[#71717a]">
             You don't have permission to view organizations. Please contact your
             administrator.
           </p>
@@ -195,8 +195,8 @@ export default function OrganizationsPage() {
     >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Organizations</h1>
-          <p className="text-gray-300 mt-1">
+          <h1 className="text-3xl font-bold text-[#fafafa]">Organizations</h1>
+          <p className="text-[#71717a] mt-1">
             Manage your organization settings and employees
           </p>
         </div>
@@ -210,22 +210,22 @@ export default function OrganizationsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Organizations</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-[#71717a]">Total Organizations</p>
+              <p className="text-2xl font-bold text-[#fafafa]">
                 {organizations?.length || 0}
               </p>
             </div>
             <Building2 className="h-8 w-8 text-purple-500" />
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Active Organizations</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-[#71717a]">Active Organizations</p>
+              <p className="text-2xl font-bold text-[#fafafa]">
                 {organizations?.filter((org: any) => org.status === "active")
                   .length || 0}
               </p>
@@ -233,11 +233,11 @@ export default function OrganizationsPage() {
             <CheckCircle className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Employees</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-[#71717a]">Total Employees</p>
+              <p className="text-2xl font-bold text-[#fafafa]">
                 {organizations?.reduce(
                   (sum: number, org: any) => sum + (org.employeeCount || 0),
                   0
@@ -252,8 +252,8 @@ export default function OrganizationsPage() {
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-4 w-1/4 bg-white/10" />
-            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-4 w-1/4 bg-[#27272a]" />
+            <Skeleton className="h-10 w-full bg-[#27272a]" />
             <Skeleton className="h-10 w-full bg-white/10" />
             <Skeleton className="h-10 w-full bg-white/10" />
           </div>
@@ -275,16 +275,16 @@ export default function OrganizationsPage() {
           />
         ) : (
           <div className="text-center py-12">
-            <Building2 className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <Building2 className="h-16 w-16 text-[#71717a] mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-[#fafafa] mb-2">
               No organizations found
             </h3>
-            <p className="text-gray-400 mb-4">
+            <p className="text-[#71717a] mb-4">
               Get started by creating your first organization.
             </p>
             <Button
               onClick={() => setShowCreate(true)}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+              className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Organization
@@ -303,15 +303,15 @@ export default function OrganizationsPage() {
           }
         }}
       >
-        <DialogContent className="bg-white/5 backdrop-blur-sm border-white/10">
+        <DialogContent className="bg-[#18181b] border-[#27272a]">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-[#fafafa]">
               Create Organization
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">
+              <label className="text-sm font-medium text-[#fafafa]">
                 Organization Name
               </label>
               <Input
@@ -323,9 +323,8 @@ export default function OrganizationsPage() {
                     setFormErrors({ ...formErrors, name: "" });
                   }
                 }}
-                className={`bg-white/5 border-white/20 text-white placeholder:text-gray-400 ${
-                  formErrors.name ? "border-red-500" : ""
-                }`}
+                className={`bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] ${formErrors.name ? "border-red-500" : ""
+                  }`}
                 required
               />
               {formErrors.name && (
@@ -337,7 +336,7 @@ export default function OrganizationsPage() {
               )}
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">
+              <label className="text-sm font-medium text-[#fafafa]">
                 Description
               </label>
               <Textarea
@@ -346,7 +345,7 @@ export default function OrganizationsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 min-h-[100px]"
+                className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] min-h-[100px]"
                 rows={3}
               />
             </div>
@@ -355,14 +354,14 @@ export default function OrganizationsPage() {
                 type="button"
                 variant="ghost"
                 onClick={() => setShowCreate(false)}
-                className="text-white/80 hover:text-white hover:bg-white/10"
+                className="text-[#71717a] hover:text-[#fafafa] hover:bg-[#27272a]"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createOrgMutation.isPending}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
               >
                 {createOrgMutation.isPending
                   ? "Creating..."

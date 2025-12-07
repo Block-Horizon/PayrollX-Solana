@@ -1,12 +1,16 @@
 import { Api } from "@/lib/generated/api";
 
 /**
- * Get authentication token from localStorage
+ * Get authentication token from sessionStorage or localStorage (fallback)
  */
 function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
 
-  const token = localStorage.getItem("auth-storage");
+  let token = sessionStorage.getItem("auth-storage");
+  if (!token) {
+    token = localStorage.getItem("auth-storage");
+  }
+
   if (token) {
     try {
       const authData = JSON.parse(token);
@@ -77,6 +81,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
+        sessionStorage.removeItem("auth-storage");
         localStorage.removeItem("auth-storage");
         window.location.href = "/login";
       }
@@ -90,10 +95,31 @@ if (typeof window !== "undefined") {
   const token = getAuthToken();
   api.setSecurityData(token);
 
-  // Listen for storage changes to update the token
-  window.addEventListener("storage", () => {
+  const updateTokenFromStorage = () => {
     const newToken = getAuthToken();
     api.setSecurityData(newToken);
+  };
+
+  const originalSessionSetItem = sessionStorage.setItem.bind(sessionStorage);
+  sessionStorage.setItem = function (key, value) {
+    originalSessionSetItem(key, value);
+    if (key === "auth-storage") {
+      updateTokenFromStorage();
+    }
+  };
+
+  const originalLocalSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function (key, value) {
+    originalLocalSetItem(key, value);
+    if (key === "auth-storage") {
+      updateTokenFromStorage();
+    }
+  };
+
+  window.addEventListener("storage", (e) => {
+    if (e.key === "auth-storage") {
+      updateTokenFromStorage();
+    }
   });
 }
 

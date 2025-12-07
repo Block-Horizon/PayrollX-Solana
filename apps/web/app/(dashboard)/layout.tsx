@@ -24,41 +24,47 @@ export default function DashboardLayout({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { isAuthenticated, user: authUser } = useAuthStore();
+  const { isAuthenticated, user: authUser, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Use the auth store instead of localStorage
-        if (!isAuthenticated || !authUser) {
-          router.push("/login");
-          return;
-        }
+    const hasCookie = typeof document !== "undefined" &&
+      document.cookie.split(';').some(c => c.trim().startsWith('auth-storage='));
 
-        // Convert auth user to dashboard user format
-        const userData: User = {
-          id: authUser.id,
-          firstName: authUser.name.split(" ")[0] || authUser.name,
-          lastName: authUser.name.split(" ").slice(1).join(" ") || "",
-          email: authUser.email,
-          role: "ORG_ADMIN", // Default role, could be from authUser.role
-        };
-        setUser(userData);
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        router.push("/login");
-      } finally {
-        setIsLoading(false);
+    if (!_hasHydrated) {
+      if (hasCookie) {
+        return;
+      } else {
+        router.replace("/login");
+        return;
       }
-    };
+    }
 
-    checkAuth();
-  }, [router, isAuthenticated, authUser]);
+    if (!hasCookie && (!isAuthenticated || !authUser)) {
+      router.replace("/login");
+      return;
+    }
+
+    if (authUser) {
+      const userData: User = {
+        id: authUser.id,
+        firstName: authUser.firstName || authUser.name.split(" ")[0] || authUser.name,
+        lastName: authUser.lastName || authUser.name.split(" ").slice(1).join(" ") || "",
+        email: authUser.email,
+        role: (authUser.role as string) || "ORG_ADMIN",
+      };
+      setUser(userData);
+      setIsLoading(false);
+    } else if (hasCookie) {
+      setIsLoading(false);
+    } else {
+      router.replace("/login");
+    }
+  }, [router, isAuthenticated, authUser, _hasHydrated]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#5eead4]"></div>
       </div>
     );
   }
@@ -68,14 +74,13 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+    <div className="min-h-screen bg-[#09090b]">
       <Header />
       <div className="flex">
         <Sidebar user={user} />
         <div className="flex-1 flex flex-col">
           <Navigation />
           <main className="flex-1 p-6">
-            {/* Wallet Balance Section */}
             <div className="mb-8">
               <WalletBalance />
             </div>

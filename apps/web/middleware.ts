@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes("_rsc")
+  ) {
+    return NextResponse.next();
+  }
+
   const token = request.cookies.get("auth-storage")?.value;
   const protectedPaths = [
     "/dashboard",
@@ -14,23 +24,23 @@ export function middleware(request: NextRequest) {
   ];
   const publicPaths = ["/login", "/register", "/"];
 
-  // Check if the current path is protected
   const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
+    pathname.startsWith(path)
   );
 
-  // Check if the current path is public
-  const isPublicPath = publicPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
-  // If accessing a protected path without token, redirect to login
   if (isProtectedPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // If accessing a public path with token, redirect to dashboard
-  if (isPublicPath && token && request.nextUrl.pathname !== "/") {
+  if (
+    isPublicPath &&
+    token &&
+    (pathname === "/login" || pathname === "/register")
+  ) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

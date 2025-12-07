@@ -108,24 +108,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#09090b] py-8">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md px-4"
       >
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10 shadow-2xl">
+        <Card className="bg-[#18181b] border-[#27272a] shadow-2xl">
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center">
-                <Zap className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-[#5eead4] rounded-xl flex items-center justify-center">
+                <Zap className="w-6 h-6 text-[#09090b]" />
               </div>
             </div>
-            <CardTitle className="text-2xl text-white">
+            <CardTitle className="text-2xl text-[#fafafa]">
               Create Account
             </CardTitle>
-            <CardDescription className="text-gray-300">
-              Join PayrollX-Solana and transform your payroll
+            <CardDescription className="text-[#71717a]">
+              Join PayrollX and transform your payroll
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,17 +134,17 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="name"
-                  className="text-white text-sm font-medium"
+                  className="text-[#fafafa] text-sm font-medium"
                 >
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717a]" />
                   <Input
                     id="name"
                     type="text"
                     placeholder="Enter your full name"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 pl-10"
+                    className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] pl-10"
                     {...register("name")}
                   />
                 </div>
@@ -155,17 +156,17 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className="text-white text-sm font-medium"
+                  className="text-[#fafafa] text-sm font-medium"
                 >
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717a]" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 pl-10"
+                    className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] pl-10"
                     {...register("email")}
                   />
                 </div>
@@ -177,17 +178,17 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="organizationName"
-                  className="text-white text-sm font-medium"
+                  className="text-[#fafafa] text-sm font-medium"
                 >
                   Organization Name
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717a]" />
                   <Input
                     id="organizationName"
                     type="text"
                     placeholder="Enter your organization name"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 pl-10"
+                    className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] pl-10"
                     {...register("organizationName")}
                   />
                 </div>
@@ -201,7 +202,7 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="password"
-                  className="text-white text-sm font-medium"
+                  className="text-[#fafafa] text-sm font-medium"
                 >
                   Password
                 </label>
@@ -210,13 +211,13 @@ export default function RegisterPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 pr-10"
+                    className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] pr-10"
                     {...register("password")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#71717a] hover:text-[#fafafa] transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -235,7 +236,7 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="confirmPassword"
-                  className="text-white text-sm font-medium"
+                  className="text-[#fafafa] text-sm font-medium"
                 >
                   Confirm Password
                 </label>
@@ -244,13 +245,13 @@ export default function RegisterPage() {
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 pr-10"
+                    className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] pr-10"
                     {...register("confirmPassword")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#71717a] hover:text-[#fafafa] transition-colors"
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -268,7 +269,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
+                className="w-full bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium shadow-lg transition-all duration-200"
                 disabled={loading}
               >
                 {loading ? "Creating Account..." : "Create Account"}
@@ -278,7 +279,7 @@ export default function RegisterPage() {
               <Button
                 variant="link"
                 onClick={() => router.push("/login")}
-                className="text-purple-400 hover:text-purple-300"
+                className="text-[#71717a] hover:text-[#fafafa]"
               >
                 Already have an account? Sign in
               </Button>

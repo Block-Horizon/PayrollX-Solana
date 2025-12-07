@@ -38,7 +38,7 @@ const columns = [
     header: "Name",
     cell: ({ row }: any) => (
       <div className="flex items-center space-x-2">
-        <User className="h-4 w-4 text-purple-500" />
+        <User className="h-4 w-4 text-[#5eead4]" />
         <span className="font-medium">{row.getValue("name")}</span>
       </div>
     ),
@@ -48,7 +48,7 @@ const columns = [
     header: "Email",
     cell: ({ row }: any) => (
       <div className="flex items-center space-x-2">
-        <Mail className="h-4 w-4 text-gray-500" />
+        <Mail className="h-4 w-4 text-[#71717a]" />
         <span>{row.getValue("email")}</span>
       </div>
     ),
@@ -76,7 +76,7 @@ const columns = [
           </span>
         </div>
       ) : (
-        <span className="text-gray-500 text-sm">Not linked</span>
+        <span className="text-[#71717a] text-sm">Not linked</span>
       );
     },
   },
@@ -255,12 +255,12 @@ export default function EmployeesPage() {
         animate={{ opacity: 1, scale: 1 }}
         className="flex items-center justify-center min-h-[400px]"
       >
-        <div className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 max-w-md">
+        <div className="text-center bg-[#18181b] border-[#27272a] rounded-lg p-8 max-w-md">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-white mb-2">
+          <h2 className="text-2xl font-semibold text-[#fafafa] mb-2">
             Access Denied
           </h2>
-          <p className="text-gray-300">
+          <p className="text-[#71717a]">
             You don't have permission to view employees. Please contact your
             administrator.
           </p>
@@ -285,8 +285,8 @@ export default function EmployeesPage() {
     >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Employees</h1>
-          <p className="text-gray-300 mt-1">
+          <h1 className="text-3xl font-bold text-[#fafafa]">Employees</h1>
+          <p className="text-[#71717a] mt-1">
             Manage your team members and their payroll information
           </p>
         </div>
@@ -294,14 +294,14 @@ export default function EmployeesPage() {
           <Button
             onClick={() => setShowKYC(true)}
             variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
+            className="border-[#27272a] text-[#fafafa] hover:bg-[#27272a]"
           >
             <Upload className="h-4 w-4 mr-2" />
             Upload KYC
           </Button>
           <Button
             onClick={() => setShowCreate(true)}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Employee
@@ -310,40 +310,40 @@ export default function EmployeesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Employees</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-[#71717a]">Total Employees</p>
+              <p className="text-2xl font-bold text-[#fafafa]">
                 {employees?.length || 0}
               </p>
             </div>
-            <User className="h-8 w-8 text-purple-500" />
+            <User className="h-8 w-8 text-[#5eead4]" />
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">KYC Verified</p>
-              <p className="text-2xl font-bold text-white">{verifiedCount}</p>
+              <p className="text-sm text-[#71717a]">KYC Verified</p>
+              <p className="text-2xl font-bold text-[#fafafa]">{verifiedCount}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Pending KYC</p>
-              <p className="text-2xl font-bold text-white">{pendingCount}</p>
+              <p className="text-sm text-[#71717a]">Pending KYC</p>
+              <p className="text-2xl font-bold text-[#fafafa]">{pendingCount}</p>
             </div>
             <Clock className="h-8 w-8 text-yellow-500" />
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <div className="bg-[#18181b] border-[#27272a] rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Payroll</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-[#71717a]">Total Payroll</p>
+              <p className="text-2xl font-bold text-[#fafafa]">
                 ${totalSalary.toLocaleString()}
               </p>
             </div>
@@ -355,8 +355,8 @@ export default function EmployeesPage() {
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-4 w-1/4 bg-white/10" />
-            <Skeleton className="h-10 w-full bg-white/10" />
+            <Skeleton className="h-4 w-1/4 bg-[#27272a]" />
+            <Skeleton className="h-10 w-full bg-[#27272a]" />
             <Skeleton className="h-10 w-full bg-white/10" />
             <Skeleton className="h-10 w-full bg-white/10" />
             <Skeleton className="h-10 w-full bg-white/10" />
@@ -381,16 +381,16 @@ export default function EmployeesPage() {
           />
         ) : (
           <div className="text-center py-12">
-            <User className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <User className="h-16 w-16 text-[#71717a] mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-[#fafafa] mb-2">
               No employees found
             </h3>
-            <p className="text-gray-400 mb-4">
+            <p className="text-[#71717a] mb-4">
               Get started by adding your first employee to the system.
             </p>
             <Button
               onClick={() => setShowCreate(true)}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+              className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Employee
@@ -410,14 +410,14 @@ export default function EmployeesPage() {
           }
         }}
       >
-        <DialogContent className="bg-white/5 backdrop-blur-sm border-white/10">
+        <DialogContent className="bg-[#18181b] border-[#27272a]">
           <DialogHeader>
             <DialogTitle className="text-white">Add New Employee</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white">Name</label>
+                <label className="text-sm font-medium text-[#fafafa]">Name</label>
                 <Input
                   placeholder="Enter full name"
                   value={formData.name}
@@ -427,9 +427,8 @@ export default function EmployeesPage() {
                       setFormErrors({ ...formErrors, name: "" });
                     }
                   }}
-                  className={`bg-white/5 border-white/20 text-white placeholder:text-gray-400 ${
-                    formErrors.name ? "border-red-500" : ""
-                  }`}
+                  className={`bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] ${formErrors.name ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formErrors.name && (
@@ -452,9 +451,8 @@ export default function EmployeesPage() {
                       setFormErrors({ ...formErrors, email: "" });
                     }
                   }}
-                  className={`bg-white/5 border-white/20 text-white placeholder:text-gray-400 ${
-                    formErrors.email ? "border-red-500" : ""
-                  }`}
+                  className={`bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] ${formErrors.email ? "border-red-500" : ""
+                    }`}
                   required
                 />
                 {formErrors.email && (
@@ -477,7 +475,7 @@ export default function EmployeesPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, position: e.target.value })
                   }
-                  className="bg-white/5 border-white/20 text-white placeholder:text-gray-400"
+                  className="bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4]"
                 />
               </div>
               <div className="space-y-2">
@@ -492,9 +490,8 @@ export default function EmployeesPage() {
                       setFormErrors({ ...formErrors, salary: "" });
                     }
                   }}
-                  className={`bg-white/5 border-white/20 text-white placeholder:text-gray-400 ${
-                    formErrors.salary ? "border-red-500" : ""
-                  }`}
+                  className={`bg-[#09090b] border-[#27272a] text-[#fafafa] placeholder:text-[#52525b] focus:border-[#5eead4] focus:ring-[#5eead4] ${formErrors.salary ? "border-red-500" : ""
+                    }`}
                   min="0"
                   step="0.01"
                 />
@@ -512,14 +509,14 @@ export default function EmployeesPage() {
                 type="button"
                 variant="ghost"
                 onClick={() => setShowCreate(false)}
-                className="text-white/80 hover:text-white hover:bg-white/10"
+                className="text-[#71717a] hover:text-[#fafafa] hover:bg-[#27272a]"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createEmployeeMutation.isPending}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                className="bg-[#5eead4] hover:bg-[#5eead4]/90 text-[#09090b] font-medium"
               >
                 {createEmployeeMutation.isPending
                   ? "Adding..."
@@ -532,14 +529,14 @@ export default function EmployeesPage() {
 
       {/* KYC Upload Dialog */}
       <Dialog open={showKYC} onOpenChange={setShowKYC}>
-        <DialogContent className="bg-white/5 backdrop-blur-sm border-white/10">
+        <DialogContent className="bg-[#18181b] border-[#27272a]">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-[#fafafa]">
               Upload KYC Documents
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-[#71717a] text-sm">
               Upload KYC documents for employee verification. Supported formats:
               PDF, PNG, JPG, JPEG, GIF
             </p>
@@ -554,7 +551,7 @@ export default function EmployeesPage() {
               />
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-400">Please select an employee first</p>
+                <p className="text-[#71717a]">Please select an employee first</p>
               </div>
             )}
           </div>
