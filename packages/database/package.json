@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate --schema=prisma/auth/schema.prisma && prisma generate --schema=prisma/org/schema.prisma && prisma generate --schema=prisma/employee/schema.prisma && prisma generate --schema=prisma/wallet/schema.prisma && prisma generate --schema=prisma/payroll/schema.prisma && prisma generate --schema=prisma/transaction/schema.prisma && prisma generate --schema=prisma/notification/schema.prisma && prisma generate --schema=prisma/compliance/schema.prisma && tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "prisma:generate": "prisma generate",
@@ -25,12 +25,13 @@
     "prisma:generate:transaction": "prisma generate --schema=prisma/transaction/schema.prisma",
     "prisma:generate:notification": "prisma generate --schema=prisma/notification/schema.prisma",
     "prisma:generate:compliance": "prisma generate --schema=prisma/compliance/schema.prisma",
-    "prisma:generate:all": "npm run prisma:generate:auth && npm run prisma:generate:org && npm run prisma:generate:employee && npm run prisma:generate:wallet && npm run prisma:generate:payroll && npm run prisma:generate:transaction && npm run prisma:generate:notification && npm run prisma:generate:compliance",
+    "prisma:generate:all": "prisma generate --schema=prisma/auth/schema.prisma && prisma generate --schema=prisma/org/schema.prisma && prisma generate --schema=prisma/employee/schema.prisma && prisma generate --schema=prisma/wallet/schema.prisma && prisma generate --schema=prisma/payroll/schema.prisma && prisma generate --schema=prisma/transaction/schema.prisma && prisma generate --schema=prisma/notification/schema.prisma && prisma generate --schema=prisma/compliance/schema.prisma",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0",
-    "prisma": "^5.0.0"
+    "@prisma/client": "^5.20.0",
+    "prisma": "^5.20.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

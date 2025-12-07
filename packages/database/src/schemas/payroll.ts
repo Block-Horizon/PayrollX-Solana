@@ -1,50 +1,34 @@
-// Payroll schema types and interfaces
-export interface PayrollRun {
-  id: string;
-  organizationId: string;
-  name: string;
-  description?: string;
-  payPeriodStart: Date;
-  payPeriodEnd: Date;
-  payDate: Date;
-  status: 'draft' | 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
-  totalAmount: number;
-  currency: string;
-  employeeCount: number;
-  blockchainTxId?: string;
-  createdAt: Date;
-  updatedAt: Date;
+import { z } from "zod";
+
+export enum PayrollStatus {
+  DRAFT = "DRAFT",
+  SCHEDULED = "SCHEDULED",
+  PROCESSING = "PROCESSING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
 }
 
-export interface PayrollItem {
-  id: string;
-  payrollRunId: string;
-  employeeId: string;
-  baseSalary: number;
-  overtime?: number;
-  bonuses?: number;
-  deductions?: number;
-  netAmount: number;
-  currency: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  blockchainTxId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export const payrollStatusSchema = z.nativeEnum(PayrollStatus);
 
-export interface CreatePayrollRunDto {
-  organizationId: string;
-  name: string;
-  description?: string;
-  payPeriodStart: Date;
-  payPeriodEnd: Date;
-  payDate: Date;
-  currency: string;
-}
+export const payrollItemSchema = z.object({
+  employeeId: z.string(),
+  amount: z.number(),
+});
 
-export interface UpdatePayrollRunDto extends Partial<CreatePayrollRunDto> {
-  status?: 'draft' | 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
-  totalAmount?: number;
-  employeeCount?: number;
-  blockchainTxId?: string;
-}
+export const payrollRunSchema = z.object({
+  id: z.string().uuid(),
+  organizationId: z.string(),
+  name: z.string().nullable(),
+  payPeriodStart: z.date(),
+  payPeriodEnd: z.date(),
+  payDate: z.date(),
+  totalAmount: z.number(),
+  currency: z.string(),
+  status: payrollStatusSchema,
+  createdBy: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type PayrollRun = z.infer<typeof payrollRunSchema>;
+export type PayrollItem = z.infer<typeof payrollItemSchema>;

@@ -1,47 +1,26 @@
-// Employee schema types and interfaces
-export interface Employee {
-  id: string;
-  organizationId: string;
-  userId: string;
-  employeeId: string; // Company employee ID
-  department?: string;
-  position?: string;
-  hireDate: Date;
-  salary?: number;
-  currency?: string;
-  isActive: boolean;
-  kycStatus: 'pending' | 'verified' | 'rejected';
-  walletAddress?: string;
-  bankAccount?: BankAccount;
-  createdAt: Date;
-  updatedAt: Date;
+import { z } from "zod";
+
+export enum KycStatus {
+  PENDING = "PENDING",
+  VERIFIED = "VERIFIED",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 
-export interface BankAccount {
-  id: string;
-  employeeId: string;
-  bankName: string;
-  accountNumber: string;
-  routingNumber?: string;
-  accountType: 'checking' | 'savings';
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export const kycStatusSchema = z.nativeEnum(KycStatus);
 
-export interface CreateEmployeeDto {
-  organizationId: string;
-  userId: string;
-  employeeId: string;
-  department?: string;
-  position?: string;
-  hireDate: Date;
-  salary?: number;
-  currency?: string;
-  walletAddress?: string;
-}
+export const employeeSchema = z.object({
+  id: z.string().uuid(),
+  organizationId: z.string(),
+  userId: z.string(),
+  walletAddress: z.string().nullable(),
+  kycStatus: kycStatusSchema,
+  kycDocuments: z.record(z.unknown()).nullable(),
+  salary: z.number().nullable(),
+  paymentToken: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().nullable(),
+});
 
-export interface UpdateEmployeeDto extends Partial<CreateEmployeeDto> {
-  isActive?: boolean;
-  kycStatus?: 'pending' | 'verified' | 'rejected';
-}
+export type Employee = z.infer<typeof employeeSchema>;

@@ -43,9 +43,9 @@ if ! command -v docker-compose &> /dev/null; then
     exit 1
 fi
 
-# Check if Yarn is installed
-if ! command -v yarn &> /dev/null; then
-    print_error "Yarn is not installed. Please install Yarn first."
+# Check if Bun is installed
+if ! command -v bun &> /dev/null; then
+    print_error "Bun is not installed. Please install Bun first."
     exit 1
 fi
 
@@ -84,13 +84,13 @@ fi
 
 # Install dependencies
 print_status "Installing dependencies..."
-yarn install
+bun install
 
 print_success "Dependencies installed ✅"
 
 # Build all services
 print_status "Building all services..."
-yarn build
+bun build
 
 print_success "All services built ✅"
 
@@ -120,7 +120,7 @@ print_success "RabbitMQ is ready ✅"
 
 # Run database migrations
 print_status "Running database migrations..."
-yarn db:migrate
+bun db:migrate
 
 print_success "Database migrations completed ✅"
 
@@ -241,15 +241,14 @@ echo ""
 
 # Run system tests
 print_status "Running system integration tests..."
-yarn test:integration
+bun test:integration
 
 print_success "System integration tests completed ✅"
 
 echo ""
 print_success "🎉 PayrollX System is fully operational!"
 echo ""
-print_status "To stop the system, run: docker-compose down"
-print_status "To view logs, run: docker-compose logs -f [service-name]"
-print_status "To restart a service, run: docker-compose restart [service-name]"
+print_status "To stop the system, run: docker compose down"
+print_status "To view logs, run: docker compose logs -f [service-name]"
+print_status "To restart a service, run: docker compose restart [service-name]"
 echo ""
-

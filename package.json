@@ -37,10 +37,10 @@
     "typescript": "5.9.2"
   },
   "engines": {
-    "node": ">=18",
-    "yarn": ">=1.22.0"
+    "node": ">=22",
+    "bun": ">=1.22.0"
   },
-  "packageManager": "npm@10.9.3",
+  "packageManager": "bun@1.22.0",
   "workspaces": [
     "apps/*",
     "packages/*",

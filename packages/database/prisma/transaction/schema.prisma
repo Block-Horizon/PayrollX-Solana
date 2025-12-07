@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/transaction"
+  output   = "../../dist/prisma/transaction"
 }
 
 datasource db {
@@ -12,81 +12,22 @@ datasource db {
 }
 
 model Transaction {
-  id           String            @id @default(uuid())
-  payrollRunId String
-  employeeId   String
-  type         TransactionType   @default(PAYROLL)
-  amount       Decimal
-  tokenAddress String?
-  signature    String?
-  status       TransactionStatus @default(PENDING)
-  error        String?
-  notes        String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  completedAt  DateTime?
+  id              String   @id @default(uuid())
+  organizationId  String
+  payrollRunId    String?
+  payrollItemId   String?
+  transactionType String
+  fromAddress     String
+  toAddress       String
+  amount          Decimal
+  tokenMint       String
+  signature       String
+  status          String   @default("PENDING")
+  confirmationCount Int    @default(0)
+  blockTime       DateTime?
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("transactions")
 }
-
-model PayrollRun {
-  id             String        @id @default(uuid())
-  organizationId String
-  status         PayrollStatus @default(DRAFT)
-  scheduledDate  DateTime
-  totalAmount    Decimal
-  currency       String        @default("SOL")
-  createdBy      String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  deletedAt      DateTime?
-
-  @@map("payroll_runs")
-}
-
-model Employee {
-  id             String   @id @default(uuid())
-  organizationId String
-  userId         String
-  walletAddress  String?
-  kycStatus      KycStatus @default(PENDING)
-  kycDocuments   Json?
-  salary         Decimal?
-  paymentToken   String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  deletedAt      DateTime?
-
-  @@map("employees")
-}
-
-enum TransactionType {
-  PAYROLL
-  BONUS
-  REFUND
-  ADJUSTMENT
-}
-
-enum TransactionStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  CANCELLED
-}
-
-enum PayrollStatus {
-  DRAFT
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-}
-
-enum KycStatus {
-  PENDING
-  VERIFIED
-  APPROVED
-  REJECTED
-}
-

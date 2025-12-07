@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/notification"
+  output   = "../../dist/prisma/notification"
 }
 
 datasource db {
@@ -12,35 +12,18 @@ datasource db {
 }
 
 model Notification {
-  id         String             @id @default(uuid())
-  userId     String
-  type       NotificationType   @default(EMAIL)
-  recipient  String
-  subject    String
-  content    String
-  templateId String?
-  metadata   Json?
-  status     NotificationStatus @default(PENDING)
-  error      String?
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  sentAt     DateTime?
+  id           String   @id @default(uuid())
+  userId       String
+  type         String
+  subject      String
+  content      String
+  status       String   @default("PENDING")
+  metadata     Json?
+  sentAt       DateTime?
+  deliveredAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("notifications")
 }
-
-enum NotificationType {
-  EMAIL
-  SMS
-  PUSH
-  IN_APP
-}
-
-enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
-  DELIVERED
-  READ
-}
-

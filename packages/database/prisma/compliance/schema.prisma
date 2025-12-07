@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/compliance"
+  output   = "../../dist/prisma/compliance"
 }
 
 datasource db {
@@ -11,49 +11,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ComplianceReport {
-  id          String             @id @default(uuid())
-  name        String
-  format      ReportFormat       @default(PDF)
-  status      ReportStatus       @default(GENERATING)
-  startDate   DateTime
-  endDate     DateTime
-  filters     Json?
-  filePath    String?
-  error       String?
-  createdBy   String
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  completedAt DateTime?
-
-  @@map("compliance_reports")
-}
-
 model AuditLog {
   id         String   @id @default(uuid())
-  userId     String
+  userId     String?
   action     String
-  entityType String
-  entityId   String
-  details    Json?
+  resource   String
+  resourceId String?
+  details    Json
   ipAddress  String?
   userAgent  String?
-  createdAt  DateTime @default(now())
+  timestamp  DateTime @default(now())
 
   @@map("audit_logs")
 }
 
-enum ReportFormat {
-  PDF
-  CSV
-  EXCEL
-  JSON
-}
+model ComplianceReport {
+  id             String   @id @default(uuid())
+  organizationId String
+  status         String   @default("PENDING")
+  reportType     String
+  findings       Json
+  recommendations String?
+  generatedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-enum ReportStatus {
-  GENERATING
-  COMPLETED
-  FAILED
-  CANCELLED
+  @@map("compliance_reports")
 }
-

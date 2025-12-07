@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/organization"
+  output   = "../../dist/prisma/org"
 }
 
 datasource db {
@@ -33,7 +33,7 @@ model Employee {
   organizationId String
   userId         String
   walletAddress  String?
-  kycStatus      KycStatus @default(PENDING)
+  kycStatus      String   @default("PENDING")
   kycDocuments   Json?
   salary         Decimal?
   paymentToken   String?
@@ -46,11 +46,3 @@ model Employee {
 
   @@map("employees")
 }
-
-enum KycStatus {
-  PENDING
-  VERIFIED
-  APPROVED
-  REJECTED
-}
-

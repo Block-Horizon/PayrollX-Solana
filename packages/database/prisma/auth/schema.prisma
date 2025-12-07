@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/auth"
+  output   = "../../dist/prisma/auth"
 }
 
 datasource db {
@@ -58,4 +58,3 @@ model AuditLog {
 
   @@map("audit_logs")
 }
-

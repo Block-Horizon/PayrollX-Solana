@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/payroll"
+  output   = "../../dist/prisma/payroll"
 }
 
 datasource db {
@@ -12,73 +12,40 @@ datasource db {
 }
 
 model PayrollRun {
-  id             String        @id @default(uuid())
-  organizationId String
-  status         PayrollStatus @default(DRAFT)
-  scheduledDate  DateTime
-  totalAmount    Decimal
-  currency       String        @default("SOL")
-  createdBy      String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  deletedAt      DateTime?
+  id               String        @id @default(uuid())
+  organizationId   String
+  name             String?
+  payPeriodStart   DateTime
+  payPeriodEnd     DateTime
+  payDate          DateTime
+  totalAmount      Decimal
+  currency         String        @default("USD")
+  status           String        @default("DRAFT")
+  createdBy        String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   // Relations
-  items          PayrollItem[]
+  items            PayrollItem[]
 
   @@map("payroll_runs")
 }
 
 model PayrollItem {
-  id           String        @id @default(uuid())
-  payrollRunId String
-  employeeId   String
-  amount       Decimal
-  status       PayrollStatus @default(DRAFT)
-  txSignature  String?
-  retryCount   Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
+  id            String   @id @default(uuid())
+  payrollRunId  String
+  employeeId    String
+  grossAmount   Decimal
+  deductions    Decimal?
+  bonuses       Decimal?
+  netAmount     Decimal
+  status        String   @default("PENDING")
+  transactionId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  payrollRun   PayrollRun    @relation(fields: [payrollRunId], references: [id])
-  employee     Employee      @relation(fields: [employeeId], references: [id])
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
 
   @@map("payroll_items")
 }
-
-model Employee {
-  id             String   @id @default(uuid())
-  organizationId String
-  userId         String
-  walletAddress  String?
-  kycStatus      KycStatus @default(PENDING)
-  kycDocuments   Json?
-  salary         Decimal?
-  paymentToken   String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  deletedAt      DateTime?
-
-  // Relations
-  payrollItems   PayrollItem[]
-
-  @@map("employees")
-}
-
-enum PayrollStatus {
-  DRAFT
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-}
-
-enum KycStatus {
-  PENDING
-  VERIFIED
-  APPROVED
-  REJECTED
-}
-

@@ -4,14 +4,11 @@ import compression from "compression";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
-import { createWinstonLogger } from "@payrollx/common/logging";
-import { getAppConfig } from "@payrollx/common/config";
+import { createWinstonLogger } from "@payrollx/common";
+import { getAppConfig } from "@payrollx/common";
 import { createComplianceDbConnection } from "@payrollx/database";
-import { connectPrisma } from "@payrollx/common/prisma";
-import {
-  createPrismaHealthCheck,
-  createHealthRoutes,
-} from "@payrollx/common/health";
+import { connectPrisma } from "@payrollx/common";
+import { createPrismaHealthCheck, createHealthRoutes } from "@payrollx/common";
 import { createComplianceRoutes } from "./routes/compliance.routes";
 import { errorHandler } from "./middleware/error-handler";
 import { requestLogger } from "./middleware/request-logger";

@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/.prisma/employee"
+  output   = "../../dist/prisma/employee"
 }
 
 datasource db {
@@ -16,7 +16,7 @@ model Employee {
   organizationId String
   userId         String
   walletAddress  String?
-  kycStatus      KycStatus @default(PENDING)
+  kycStatus      String   @default("PENDING")
   kycDocuments   Json?
   salary         Decimal?
   paymentToken   String?
@@ -24,33 +24,5 @@ model Employee {
   updatedAt      DateTime @updatedAt
   deletedAt      DateTime?
 
-  // Relations
-  organization   Organization @relation(fields: [organizationId], references: [id])
-
   @@map("employees")
 }
-
-model Organization {
-  id                  String    @id @default(uuid())
-  name                String    @unique
-  config              Json?
-  authorizedSigners   String[]
-  onboardingCompleted Boolean   @default(false)
-  createdBy           String
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  deletedAt           DateTime?
-
-  // Relations
-  employees           Employee[]
-
-  @@map("organizations")
-}
-
-enum KycStatus {
-  PENDING
-  VERIFIED
-  APPROVED
-  REJECTED
-}
-
