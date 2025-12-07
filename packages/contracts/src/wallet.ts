@@ -1,109 +1,50 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsUUID,
-  IsArray,
-} from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { z } from 'zod';
 
-export class GenerateWalletDto {
-  @ApiProperty({ description: "Employee ID" })
-  @IsUUID()
-  employeeId: string;
+export const generateWalletSchema = z.object({
+  employeeId: z.string().uuid('Employee ID must be a valid UUID'),
+  participantCount: z.number().int().positive().optional().default(3),
+});
 
-  @ApiProperty({
-    description: "Number of participants for MPC",
-    required: false,
-    default: 3,
-  })
-  @IsOptional()
-  @IsNumber()
-  participantCount?: number;
-}
+export type GenerateWalletDto = z.infer<typeof generateWalletSchema>;
 
-export class SignTransactionDto {
-  @ApiProperty({ description: "Recipient address" })
-  @IsString()
-  toAddress: string;
+export const signTransactionSchema = z.object({
+  toAddress: z.string().min(1, 'Recipient address is required'),
+  amount: z.number().positive('Amount must be positive'),
+  memo: z.string().optional(),
+  recentBlockHash: z.string().min(1, 'Recent block hash is required'),
+});
 
-  @ApiProperty({ description: "Amount in lamports" })
-  @IsNumber()
-  amount: number;
+export type SignTransactionDto = z.infer<typeof signTransactionSchema>;
 
-  @ApiProperty({ description: "Transaction memo", required: false })
-  @IsOptional()
-  @IsString()
-  memo?: string;
+export const getBalanceSchema = z.object({
+  address: z.string().optional(),
+});
 
-  @ApiProperty({ description: "Recent block hash" })
-  @IsString()
-  recentBlockHash: string;
-}
+export type GetBalanceDto = z.infer<typeof getBalanceSchema>;
 
-export class GetBalanceDto {
-  @ApiProperty({ description: "Wallet address", required: false })
-  @IsOptional()
-  @IsString()
-  address?: string;
-}
-
-export class WalletResponseDto {
-  @ApiProperty({ description: "Wallet ID" })
+export interface WalletResponseDto {
   id: string;
-
-  @ApiProperty({ description: "Employee ID" })
   employeeId: string;
-
-  @ApiProperty({ description: "Public key" })
   publicKey: string;
-
-  @ApiProperty({ description: "Key share IDs" })
   keyShareIds: string[];
-
-  @ApiProperty({ description: "Provider" })
   provider: string;
-
-  @ApiProperty({ description: "Created by user ID" })
   createdBy: string;
-
-  @ApiProperty({ description: "Creation timestamp" })
   createdAt: Date;
-
-  @ApiProperty({ description: "Last update timestamp" })
   updatedAt: Date;
 }
 
-export class SignTransactionResponseDto {
-  @ApiProperty({ description: "Transaction signature" })
+export interface SignTransactionResponseDto {
   signature: string;
-
-  @ApiProperty({ description: "Transaction ID" })
   transactionId: string;
-
-  @ApiProperty({ description: "Wallet ID" })
   walletId: string;
-
-  @ApiProperty({ description: "Signing timestamp" })
   signedAt: string;
 }
 
-export class BalanceResponseDto {
-  @ApiProperty({ description: "Wallet ID" })
+export interface BalanceResponseDto {
   walletId: string;
-
-  @ApiProperty({ description: "Wallet address" })
   address: string;
-
-  @ApiProperty({ description: "Balance in lamports" })
   balance: number;
-
-  @ApiProperty({ description: "Balance in lamports" })
   lamports: number;
-
-  @ApiProperty({ description: "Balance in SOL" })
   sol: number;
-
-  @ApiProperty({ description: "Balance check timestamp" })
   checkedAt: string;
 }

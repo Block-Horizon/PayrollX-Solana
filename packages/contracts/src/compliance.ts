@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsObject, IsEnum } from 'class-validator';
+import { z } from 'zod';
 
 export enum ComplianceStatus {
   COMPLIANT = 'compliant',
@@ -7,64 +7,38 @@ export enum ComplianceStatus {
   UNDER_INVESTIGATION = 'under_investigation',
 }
 
-export class CreateAuditLogDto {
-  @IsOptional()
-  @IsString()
-  organizationId?: string;
+export const createAuditLogSchema = z.object({
+  organizationId: z.string().optional(),
+  userId: z.string().optional(),
+  action: z.string().min(1, 'Action is required'),
+  resource: z.string().min(1, 'Resource is required'),
+  resourceId: z.string().optional(),
+  details: z.record(z.unknown()),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  userId?: string;
+export type CreateAuditLogDto = z.infer<typeof createAuditLogSchema>;
 
-  @IsString()
-  action: string;
-
-  @IsString()
-  resource: string;
-
-  @IsOptional()
-  @IsString()
-  resourceId?: string;
-
-  @IsObject()
-  details: Record<string, any>;
-
-  @IsOptional()
-  @IsString()
-  ipAddress?: string;
-
-  @IsOptional()
-  @IsString()
-  userAgent?: string;
-}
-
-export class AuditLogResponseDto {
+export interface AuditLogResponseDto {
   id: string;
   organizationId?: string;
   userId?: string;
   action: string;
   resource: string;
   resourceId?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
   timestamp: Date;
 }
 
-export class ComplianceReportDto {
-  @IsString()
-  organizationId: string;
+export const complianceReportSchema = z.object({
+  organizationId: z.string().min(1, 'Organization ID is required'),
+  status: z.nativeEnum(ComplianceStatus),
+  reportType: z.string().min(1, 'Report type is required'),
+  findings: z.record(z.unknown()),
+  recommendations: z.string().optional(),
+});
 
-  @IsEnum(ComplianceStatus)
-  status: ComplianceStatus;
-
-  @IsString()
-  reportType: string;
-
-  @IsObject()
-  findings: Record<string, any>;
-
-  @IsOptional()
-  @IsString()
-  recommendations?: string;
-}
+export type ComplianceReportDto = z.infer<typeof complianceReportSchema>;

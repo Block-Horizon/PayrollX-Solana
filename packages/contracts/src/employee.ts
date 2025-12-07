@@ -1,101 +1,53 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  IsEnum,
-  IsUUID,
-} from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { z } from 'zod';
 
 export enum KycStatus {
-  PENDING = "PENDING",
-  VERIFIED = "VERIFIED",
-  APPROVED = "APPROVED",
-  REJECTED = "REJECTED",
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
 }
 
-export class CreateEmployeeDto {
-  @ApiProperty({ description: "Organization ID" })
-  @IsUUID()
-  organizationId: string;
+export const kycStatusSchema = z.nativeEnum(KycStatus);
 
-  @ApiProperty({ description: "User ID" })
-  @IsUUID()
-  userId: string;
+export const createEmployeeSchema = z.object({
+  organizationId: z.string().uuid('Organization ID must be a valid UUID'),
+  userId: z.string().uuid('User ID must be a valid UUID'),
+  salary: z.number().positive().optional(),
+  paymentToken: z.string().optional(),
+});
 
-  @ApiProperty({ description: "Salary amount", required: false })
-  @IsOptional()
-  @IsNumber()
-  salary?: number;
+export type CreateEmployeeDto = z.infer<typeof createEmployeeSchema>;
 
-  @ApiProperty({ description: "Payment token", required: false })
-  @IsOptional()
-  @IsString()
-  paymentToken?: string;
-}
+export const updateEmployeeSchema = z.object({
+  salary: z.number().positive().optional(),
+  paymentToken: z.string().optional(),
+  kycStatus: kycStatusSchema.optional(),
+});
 
-export class UpdateEmployeeDto {
-  @ApiProperty({ description: "Salary amount", required: false })
-  @IsOptional()
-  @IsNumber()
-  salary?: number;
+export type UpdateEmployeeDto = z.infer<typeof updateEmployeeSchema>;
 
-  @ApiProperty({ description: "Payment token", required: false })
-  @IsOptional()
-  @IsString()
-  paymentToken?: string;
+export const linkWalletSchema = z.object({
+  walletAddress: z.string().min(1, 'Wallet address is required'),
+});
 
-  @ApiProperty({ description: "KYC status", required: false, enum: KycStatus })
-  @IsOptional()
-  @IsEnum(KycStatus)
-  kycStatus?: KycStatus;
-}
+export type LinkWalletDto = z.infer<typeof linkWalletSchema>;
 
-export class LinkWalletDto {
-  @ApiProperty({ description: "Solana wallet address" })
-  @IsString()
-  walletAddress: string;
-}
+export const kycDocumentSchema = z.object({
+  documentType: z.string().min(1, 'Document type is required'),
+  description: z.string().optional(),
+});
 
-export class KycDocumentDto {
-  @ApiProperty({ description: "Document type" })
-  @IsString()
-  documentType: string;
+export type KycDocumentDto = z.infer<typeof kycDocumentSchema>;
 
-  @ApiProperty({ description: "Document description", required: false })
-  @IsOptional()
-  @IsString()
-  description?: string;
-}
-
-export class EmployeeResponseDto {
-  @ApiProperty({ description: "Employee ID" })
+export interface EmployeeResponseDto {
   id: string;
-
-  @ApiProperty({ description: "Organization ID" })
   organizationId: string;
-
-  @ApiProperty({ description: "User ID" })
   userId: string;
-
-  @ApiProperty({ description: "Wallet address", required: false })
   walletAddress?: string;
-
-  @ApiProperty({ description: "KYC status", enum: KycStatus })
   kycStatus: KycStatus;
-
-  @ApiProperty({ description: "KYC documents", required: false })
-  kycDocuments?: Record<string, any>;
-
-  @ApiProperty({ description: "Salary", required: false })
+  kycDocuments?: Record<string, unknown>;
   salary?: number;
-
-  @ApiProperty({ description: "Payment token", required: false })
   paymentToken?: string;
-
-  @ApiProperty({ description: "Creation timestamp" })
   createdAt: Date;
-
-  @ApiProperty({ description: "Last update timestamp" })
   updatedAt: Date;
 }

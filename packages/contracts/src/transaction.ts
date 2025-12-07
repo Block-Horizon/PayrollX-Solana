@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsEnum, IsDateString } from 'class-validator';
+import { z } from 'zod';
 
 export enum TransactionStatus {
   PENDING = 'pending',
@@ -6,56 +6,30 @@ export enum TransactionStatus {
   FAILED = 'failed',
 }
 
-export class CreateTransactionDto {
-  @IsString()
-  organizationId: string;
+export const createTransactionSchema = z.object({
+  organizationId: z.string().min(1, 'Organization ID is required'),
+  payrollRunId: z.string().optional(),
+  payrollItemId: z.string().optional(),
+  transactionType: z.enum(['payroll', 'wallet_funding', 'token_swap', 'fee_payment']),
+  fromAddress: z.string().min(1, 'From address is required'),
+  toAddress: z.string().min(1, 'To address is required'),
+  amount: z.number().positive('Amount must be positive'),
+  tokenMint: z.string().min(1, 'Token mint is required'),
+  signature: z.string().min(1, 'Signature is required'),
+});
 
-  @IsOptional()
-  @IsString()
-  payrollRunId?: string;
+export type CreateTransactionDto = z.infer<typeof createTransactionSchema>;
 
-  @IsOptional()
-  @IsString()
-  payrollItemId?: string;
+export const updateTransactionSchema = z.object({
+  status: z.nativeEnum(TransactionStatus).optional(),
+  confirmationCount: z.number().int().nonnegative().optional(),
+  blockTime: z.date().optional(),
+  errorMessage: z.string().optional(),
+});
 
-  @IsEnum(['payroll', 'wallet_funding', 'token_swap', 'fee_payment'])
-  transactionType: string;
+export type UpdateTransactionDto = z.infer<typeof updateTransactionSchema>;
 
-  @IsString()
-  fromAddress: string;
-
-  @IsString()
-  toAddress: string;
-
-  @IsNumber()
-  amount: number;
-
-  @IsString()
-  tokenMint: string;
-
-  @IsString()
-  signature: string;
-}
-
-export class UpdateTransactionDto {
-  @IsOptional()
-  @IsEnum(TransactionStatus)
-  status?: TransactionStatus;
-
-  @IsOptional()
-  @IsNumber()
-  confirmationCount?: number;
-
-  @IsOptional()
-  @IsDateString()
-  blockTime?: Date;
-
-  @IsOptional()
-  @IsString()
-  errorMessage?: string;
-}
-
-export class TransactionResponseDto {
+export interface TransactionResponseDto {
   id: string;
   organizationId: string;
   payrollRunId?: string;

@@ -1,44 +1,24 @@
-import { IsString, IsOptional, IsDateString, IsUUID } from "class-validator";
+import { z } from 'zod';
 
-export class BaseEntity {
-  @IsUUID()
-  id!: string;
+export const paginationSchema = z.object({
+  page: z.string().optional().default('1'),
+  limit: z.string().optional().default('10'),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
+});
 
-  @IsDateString()
-  createdAt!: Date;
+export type PaginationDto = z.infer<typeof paginationSchema>;
 
-  @IsDateString()
-  updatedAt!: Date;
-}
-
-export class PaginationDto {
-  @IsOptional()
-  @IsString()
-  page?: string = "1";
-
-  @IsOptional()
-  @IsString()
-  limit?: string = "10";
-
-  @IsOptional()
-  @IsString()
-  sortBy?: string;
-
-  @IsOptional()
-  @IsString()
-  sortOrder?: "asc" | "desc" = "asc";
-}
-
-export class ApiResponse<T> {
-  success!: boolean;
+export interface ApiResponse<T> {
+  success: boolean;
   data?: T;
   message?: string;
   error?: string;
-  timestamp!: string;
+  timestamp: string;
 }
 
-export class PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination!: {
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
     page: number;
     limit: number;
     total: number;

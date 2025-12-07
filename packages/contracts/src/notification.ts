@@ -1,10 +1,10 @@
-import { IsString, IsOptional, IsEnum, IsObject } from 'class-validator';
+import { z } from 'zod';
 
 export enum NotificationType {
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
-  WEBHOOK = 'webhook',
+  EMAIL = 'EMAIL',
+  SMS = 'SMS',
+  PUSH = 'PUSH',
+  WEBHOOK = 'WEBHOOK',
 }
 
 export enum NotificationStatus {
@@ -14,28 +14,18 @@ export enum NotificationStatus {
   FAILED = 'failed',
 }
 
-export class CreateNotificationDto {
-  @IsString()
-  organizationId: string;
+export const createNotificationSchema = z.object({
+  organizationId: z.string().min(1, 'Organization ID is required'),
+  recipientId: z.string().min(1, 'Recipient ID is required'),
+  type: z.nativeEnum(NotificationType),
+  subject: z.string().min(1, 'Subject is required'),
+  content: z.string().min(1, 'Content is required'),
+  metadata: z.record(z.unknown()).optional(),
+});
 
-  @IsString()
-  recipientId: string;
+export type CreateNotificationDto = z.infer<typeof createNotificationSchema>;
 
-  @IsEnum(NotificationType)
-  type: NotificationType;
-
-  @IsString()
-  subject: string;
-
-  @IsString()
-  content: string;
-
-  @IsOptional()
-  @IsObject()
-  metadata?: Record<string, any>;
-}
-
-export class NotificationResponseDto {
+export interface NotificationResponseDto {
   id: string;
   organizationId: string;
   recipientId: string;
@@ -43,7 +33,7 @@ export class NotificationResponseDto {
   subject: string;
   content: string;
   status: NotificationStatus;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   sentAt?: Date;
   deliveredAt?: Date;
   errorMessage?: string;
